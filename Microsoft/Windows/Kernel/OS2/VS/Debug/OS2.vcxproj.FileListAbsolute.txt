@@ -1,0 +1,3 @@
+C:\Micrium_Win32_Kernel\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe
+C:\Micrium_Win32_Kernel_Lab1\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe
+C:\RTOS_M11102140_HW1\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe

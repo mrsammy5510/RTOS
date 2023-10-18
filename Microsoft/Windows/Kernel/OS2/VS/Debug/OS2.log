@@ -1,0 +1,33 @@
+﻿  cpu_core.c
+  cpu_c.c
+  lib_ascii.c
+  lib_math.c
+  lib_mem.c
+  lib_str.c
+  os_cpu_c.c
+  os_core.c
+C:\RTOS_M11102140_HW1\Micrium\Software\uCOS-II\Source\os_core.c(990,13): warning C4013: 'exit' 未定義; 假設 extern 傳回整數
+  os_dbg_r.c
+  os_flag.c
+  os_mbox.c
+  os_mem.c
+  os_mutex.c
+  os_q.c
+  os_sem.c
+  os_task.c
+  os_time.c
+  os_tmr.c
+  bsp_cpu.c
+  app_hooks.c
+C:\RTOS_M11102140_HW1\Microsoft\Windows\Kernel\OS2\app_hooks.c(124,27): warning C4013: 'atoi' 未定義; 假設 extern 傳回整數
+  正在產生程式碼...
+  正在編譯...
+  main.c
+C:\RTOS_M11102140_HW1\Microsoft\Windows\Kernel\OS2\main.c(109,16): warning C4013: 'malloc' 未定義; 假設 extern 傳回整數
+C:\RTOS_M11102140_HW1\Microsoft\Windows\Kernel\OS2\main.c(109,14): warning C4047: '=': 'OS_STK **' 與 'int' 間接取值的層級不同
+C:\RTOS_M11102140_HW1\Microsoft\Windows\Kernel\OS2\main.c(114,21): warning C4047: '=': 'OS_STK *' 與 'int' 間接取值的層級不同
+C:\RTOS_M11102140_HW1\Microsoft\Windows\Kernel\OS2\main.c(122,37): warning C4244: '函式': 將 'INT16U' 轉換為 'INT8U'，由於類型不同，可能導致資料遺失
+C:\RTOS_M11102140_HW1\Microsoft\Windows\Kernel\OS2\main.c(132,25): warning C4244: '函式': 將 'INT16U' 轉換為 'INT8U'，由於類型不同，可能導致資料遺失
+C:\RTOS_M11102140_HW1\Microsoft\Windows\Kernel\OS2\main.c(90,17): warning C4101: 'os_err': 未參考的區域變數
+  正在產生程式碼...
+  OS2.vcxproj -> C:\RTOS_M11102140_HW1\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe
