@@ -1,0 +1,8 @@
+﻿  main.c
+C:\Micrium_Win32_Kernel\Microsoft\Windows\Kernel\OS2\main.c(109,16): warning C4013: 'malloc' undefined; assuming extern returning int
+C:\Micrium_Win32_Kernel\Microsoft\Windows\Kernel\OS2\main.c(109,14): warning C4047: '=': 'OS_STK **' differs in levels of indirection from 'int'
+C:\Micrium_Win32_Kernel\Microsoft\Windows\Kernel\OS2\main.c(114,21): warning C4047: '=': 'OS_STK *' differs in levels of indirection from 'int'
+C:\Micrium_Win32_Kernel\Microsoft\Windows\Kernel\OS2\main.c(120,37): warning C4244: 'function': conversion from 'INT16U' to 'INT8U', possible loss of data
+C:\Micrium_Win32_Kernel\Microsoft\Windows\Kernel\OS2\main.c(130,25): warning C4244: 'function': conversion from 'INT16U' to 'INT8U', possible loss of data
+C:\Micrium_Win32_Kernel\Microsoft\Windows\Kernel\OS2\main.c(90,17): warning C4101: 'os_err': unreferenced local variable
+  OS2.vcxproj -> C:\Micrium_Win32_Kernel\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe
