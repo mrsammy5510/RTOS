@@ -141,7 +141,7 @@ void InputFile()
             i++;
         }
         // Initial Priority
-        TaskParameter[j].TaskPriority = j;
+        TaskParameter[j].TaskPriority = j + 1;
         j++;
     }
     fclose(fp);

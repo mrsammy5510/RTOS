@@ -705,7 +705,6 @@ void  OSIntExit (void)          //眖ISR锣炊硄task
         }
         if (OSIntNesting == 0u) {                          /* Reschedule only if all ISRs complete ... */
             if (OSLockNesting == 0u) {                     /* ... and not locked.                      */
-                
                 OS_SchedNew();
                 OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];
 
@@ -713,20 +712,20 @@ void  OSIntExit (void)          //眖ISR锣炊硄task
                 if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy */
 
                     //穨э场だ M11102140
-                    OSSchedLock();
+                    printf("%-4d\ttask(%2d)      \t\ttask(%2d)(%2d)\t\t%2d\n",
+                        OSTime, OSTCBCur->OSTCBPrio, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr, OSCtxSwCtr);
 
-                    TaskSchedInfo[OSPrioHighRdy].TaskStartTime = TaskSchedInfo[OSPrioHighRdy].TaskStartTime + TaskSchedInfo[OSPrioHighRdy].TaskPeriodic;
-                    TaskSchedInfo[OSPrioHighRdy].TaskDeadline = TaskSchedInfo[OSPrioHighRdy].TaskStartTime + TaskSchedInfo[OSPrioHighRdy].TaskPeriodic;
-                    TaskSchedInfo[OSPrioHighRdy].TaskExpFinTime = TaskSchedInfo[OSPrioHighRdy].TaskStartTime + TaskSchedInfo[OSPrioHighRdy].TaskExecuteTime;
-
-                    printf("%2d\tPreemption\ttask(%2d)    \ttask(%2d)(%2d)\n",
-                        OSTime, OSTCBCur->OSTCBPrio, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%-4d\ttask(%2d)      \t\ttask(%2d)(%2d)\t\t%2d\n",OSTime, 
+                            OSTCBCur->OSTCBPrio, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr, OSCtxSwCtr);
+                        fclose(Output_fp);
+                    }
 
                     OSCtxSwCtr++;                          /* Keep track of the number of ctx switches */
 
 #if OS_TASK_PROFILE_EN > 0u
                     OSTCBCur->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task  */
-#endif              
+#endif          
                     //穨э场だ   M11102140
 
 
@@ -886,20 +885,21 @@ void  OSSchedUnlock (void)
 void  OSStart (void)
 {
     if (OSRunning == OS_FALSE) {
-        
+        //穨э场だ M11102140
+        printf("Tick\tCurrentTask ID\t\tNextTask ID \t\tNumber of ctx switches\n");
         OS_SchedNew();                               /* Find highest priority's task priority number   */
         OSPrioCur     = OSPrioHighRdy;
         OSTCBHighRdy  = OSTCBPrioTbl[OSPrioHighRdy]; /* Point to highest priority task ready to run    */
         OSTCBCur      = OSTCBHighRdy;
-        //穨э场だ M11102140
-        printf("================TCB linked list================\n");
-        printf("Task\tPrev_TCB_addr\tTCB_addr   Next_TCB_addr\n");
-        for (OS_TCB* TCB_iter = OSTCBList; TCB_iter != (OS_TCB*)0; TCB_iter = TCB_iter->OSTCBNext) {
-            printf("%2d\t%11x\t%8x      %8x\n", TCB_iter->OSTCBPrio, TCB_iter->OSTCBPrev, TCB_iter, TCB_iter->OSTCBNext);
-        }
-        printf("Tick\tEvent     \tCurrentTask ID\tNextTask ID \tResponseTime\tPreemptionTime\tOSTimeDly\n");
-        //穨э场だ M11102140
+        printf("%-4d\t***********   \t\ttask(%2d)(%2d)\t\t%2d\n", OSTimeGet(), 
+                OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr, OSCtxSwCtr);
 
+        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+            fprintf(Output_fp, "%-4d\t***********   \t\ttask(%2d)(%2d)\t\t%2d\n", OSTimeGet(),
+                OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr, OSCtxSwCtr);
+            fclose(Output_fp);
+        }
+        //穨э场だ M11102140
         OSStartHighRdy();                            /* Execute target specific code to start task     */
         
     }
@@ -1751,30 +1751,32 @@ void  OS_Sched (void)       //task㎝taskぇ丁ち传
 
             //穨э场だ M11102140
             if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy     */
-                if (OSPrioHighRdy != OS_TASK_IDLE_PRIO) {
-                    printf("%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t%7d\n",
-                        OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr,
-                        (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime)),
-                        (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime));
+
+                if (OSTCBHighRdy->OSTCBPrio != 63) {
+
+                    printf("%-4d\ttask(%2d)(%2d)  \t\ttask(%2d)(%2d)\t\t%2d\n",
+                        OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr, OSCtxSwCtr);
+
+                   if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%-4d\ttask(%2d)(%2d)  \t\ttask(%2d)(%2d)\t\t%2d\n", OSTime, 
+                            OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr, OSCtxSwCtr);
+                        fclose(Output_fp);
+                   }
                 }
                 else {
-                    printf("%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)    \t%8d    \t%8d      \t%7d\n",
-                        OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBPrio,
-                        (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime)),
-                        (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime));
+                    printf("%-4d\ttask(%2d)(%2d)  \t\ttask(%2d)    \t\t%2d\n",
+                        OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBPrio, OSCtxSwCtr);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%-4d\ttask(%2d)(%2d)  \t\ttask(%2d)    \t\t%2d\n",
+                            OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBPrio, OSCtxSwCtr);
+                       fclose(Output_fp);
+                    }
                 }
-                
 
-                if (OSPrioHighRdy != OS_TASK_IDLE_PRIO) {
-                    OSSchedLock();
-                    TaskSchedInfo[OSPrioHighRdy].TaskStartTime = TaskSchedInfo[OSPrioHighRdy].TaskStartTime + TaskSchedInfo[OSPrioHighRdy].TaskPeriodic;
-                    TaskSchedInfo[OSPrioHighRdy].TaskDeadline = TaskSchedInfo[OSPrioHighRdy].TaskStartTime + TaskSchedInfo[OSPrioHighRdy].TaskPeriodic;
-                    TaskSchedInfo[OSPrioHighRdy].TaskExpFinTime = TaskSchedInfo[OSPrioHighRdy].TaskStartTime + TaskSchedInfo[OSPrioHighRdy].TaskExecuteTime;
-                }
                 OSCtxSwCtr++;                          /* Increment context switch counter             */   //羆context switch碭Ω
 
 #if OS_TASK_PROFILE_EN > 0u
-                OSTCBCur->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task   讽玡程蔼priotitytask   */   
+                OSTCBCur->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task      */   //讽玡程蔼priotitytask
 #endif              
             //穨э场だ   M11102140
 
@@ -2170,6 +2172,7 @@ INT8U  OS_TCBInit (INT8U    prio,
         OS_ENTER_CRITICAL();
         OSTCBPrioTbl[prio] = ptcb;
         OS_EXIT_CRITICAL();
+
         OSTaskCreateHook(ptcb);                            /* Call user defined hook                   */
 
 #if OS_TASK_CREATE_EXT_EN > 0u
@@ -2192,15 +2195,6 @@ INT8U  OS_TCBInit (INT8U    prio,
         OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
         OSTaskCtr++;                                       /* Increment the #tasks counter             */
         OS_TRACE_TASK_READY(ptcb);
-        
-        //
-        printf("Task[%3.1d] created, TCB Address%8x\n", ptcb->OSTCBPrio, ptcb);
-        printf("------After TCB[%2d] begin linked------\n", ptcb->OSTCBPrio);
-        printf("Previous TCB point to address  %8x\n", ptcb->OSTCBPrev);
-        printf("Current  TCB point to address  %8x\n", ptcb);
-        printf("Next     TCB point to address  %8x\n\n", ptcb->OSTCBNext);
-        //
-
         OS_EXIT_CRITICAL();
         return (OS_ERR_NONE);
     }

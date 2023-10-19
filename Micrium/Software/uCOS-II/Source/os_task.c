@@ -389,41 +389,9 @@ INT8U  OSTaskCreateExt (void   (*task)(void *p_arg),
 #if (OS_TASK_STAT_STK_CHK_EN > 0u)
         OS_TaskStkClr(pbos, stk_size, opt);                    /* Clear the task stack (if needed)     */   //當task創立時，清空每個task自身的stack(*pbos)
 #endif
+
         psp = OSTaskStkInit(task, p_arg, ptos, opt);           /* Initialize the task's stack          */   //初始化每個task中的stack
         err = OS_TCBInit(prio, psp, pbos, id, stk_size, pext, opt);     //初始化Task Control Block
-
-        //作業更改的部分 m11102140
-        
-
-
-
-        if (prio != OS_TASK_IDLE_PRIO) {                            //將task作delay，與OSTimeDly不同的是不重新作OS_Sched()
-            task_para_set* taskPara = p_arg;
-            OS_TCB* ptcb = OSTCBPrioTbl[prio];
-
-            TaskSchedInfo[prio].TaskStartTime = taskPara->TaskArriveTime;
-            TaskSchedInfo[prio].TaskExecuteTime = taskPara->TaskExecuteTime;
-            TaskSchedInfo[prio].TaskPeriodic = taskPara->TaskPeriodic;
-            TaskSchedInfo[prio].TaskDeadline = TaskSchedInfo[prio].TaskStartTime + TaskSchedInfo[prio].TaskPeriodic;
-            TaskSchedInfo[prio].TaskExpFinTime = TaskSchedInfo[prio].TaskStartTime + TaskSchedInfo[prio].TaskExecuteTime;
-
-            if (taskPara->TaskArriveTime != 0) {
-                INT8U      y;
-                OS_ENTER_CRITICAL();
-                y = ptcb->OSTCBY;        
-                OSRdyTbl[y] &= (OS_PRIO)~ptcb->OSTCBBitX;
-                OS_TRACE_TASK_SUSPENDED(ptcb);
-                if (OSRdyTbl[y] == 0u) {
-                    OSRdyGrp &= (OS_PRIO)~ptcb->OSTCBBitY;
-                }
-                ptcb->OSTCBDly = taskPara->TaskArriveTime;             
-                OS_TRACE_TASK_DLY(taskPara->TaskArriveTime);
-                OS_EXIT_CRITICAL();
-
-            }
-        }
-        //作業更改的部分 m11102140
-
         if (err == OS_ERR_NONE) {
             OS_TRACE_TASK_CREATE(OSTCBPrioTbl[prio]);           //創建task
             if (OSRunning == OS_TRUE) {                        /* Find HPT if multitasking has started */

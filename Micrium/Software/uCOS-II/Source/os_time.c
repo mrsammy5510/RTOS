@@ -51,15 +51,14 @@
 * Returns    : none
 *********************************************************************************************************
 */
+
 void  OSTimeDly (INT32U ticks)
 {
     INT8U      y;
 #if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
     OS_CPU_SR  cpu_sr = 0u;
 #endif
-    //
-    OSSchedUnlock();
-    //
+
 
 
     if (OSIntNesting > 0u) {                     /* See if trying to call from an ISR                  */
@@ -70,7 +69,6 @@ void  OSTimeDly (INT32U ticks)
     }
     if (ticks > 0u) {                            /* 0 means no delay!                                  */
         OS_ENTER_CRITICAL();
-        
         y            =  OSTCBCur->OSTCBY;        /* Delay current task                                 */
         OSRdyTbl[y] &= (OS_PRIO)~OSTCBCur->OSTCBBitX;
         OS_TRACE_TASK_SUSPENDED(OSTCBCur);
