@@ -58,7 +58,21 @@ void  OSTimeDly (INT32U ticks)
     OS_CPU_SR  cpu_sr = 0u;
 #endif
     //
-    OSSchedUnlock();
+    if (OSRunning == OS_TRUE) {                            /* Make sure multitasking is running        */
+        OS_ENTER_CRITICAL();
+        if (OSIntNesting == 0u) {                          /* Can't call from an ISR                   */
+            if (OSLockNesting > 0u) {                      /* Do not decrement if already 0            */
+                OSLockNesting--;                           /* Decrement lock nesting level             */
+                OS_EXIT_CRITICAL();
+            }
+            else {
+                OS_EXIT_CRITICAL();
+            }
+        }
+        else {
+            OS_EXIT_CRITICAL();
+        }
+    }
     //
 
 

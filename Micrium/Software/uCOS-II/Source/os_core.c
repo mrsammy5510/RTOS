@@ -715,11 +715,11 @@ void  OSIntExit (void)          //從ISR轉到普通task
                     //作業更改的部分 M11102140
                     OSSchedLock();
 
-                    TaskSchedInfo[OSPrioHighRdy].TaskStartTime = TaskSchedInfo[OSPrioHighRdy].TaskStartTime + TaskSchedInfo[OSPrioHighRdy].TaskPeriodic;
-                    TaskSchedInfo[OSPrioHighRdy].TaskDeadline = TaskSchedInfo[OSPrioHighRdy].TaskStartTime + TaskSchedInfo[OSPrioHighRdy].TaskPeriodic;
-                    TaskSchedInfo[OSPrioHighRdy].TaskExpFinTime = TaskSchedInfo[OSPrioHighRdy].TaskStartTime + TaskSchedInfo[OSPrioHighRdy].TaskExecuteTime;
+                    //TaskSchedInfo[OSPrioHighRdy].TaskStartTime = TaskSchedInfo[OSPrioHighRdy].TaskStartTime + TaskSchedInfo[OSPrioHighRdy].TaskPeriodic;
+                    //TaskSchedInfo[OSPrioHighRdy].TaskDeadline = TaskSchedInfo[OSPrioHighRdy].TaskStartTime + TaskSchedInfo[OSPrioHighRdy].TaskPeriodic;
+                    //TaskSchedInfo[OSPrioHighRdy].TaskExpFinTime = TaskSchedInfo[OSPrioHighRdy].TaskStartTime + TaskSchedInfo[OSPrioHighRdy].TaskExecuteTime;
 
-                    printf("%2d\tPreemption\ttask(%2d)    \ttask(%2d)(%2d)\n",
+                    printf("%2d\tPreemption\t  task(%2d)    \ttask(%2d)(%2d)\n",
                         OSTime, OSTCBCur->OSTCBPrio, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr);
 
                     OSCtxSwCtr++;                          /* Keep track of the number of ctx switches */
@@ -1039,6 +1039,16 @@ void  OSTimeTick (void)
             ptcb = ptcb->OSTCBNext;                        /* Point at next TCB in TCB list                */
             OS_EXIT_CRITICAL();
         }
+
+        OS_ENTER_CRITICAL();
+        for (int i = 0; i < TASK_NUMBER; i++) {
+            if (OSTime > TaskSchedInfo[i].TaskStartTime && OSTime >= TaskSchedInfo[i].TaskDeadline) {
+                printf("%2d  \tMissdeadline      task(%2d)(%2d)   -------------------\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
+                exit(1);
+            }
+        }
+        OS_EXIT_CRITICAL();
+
     }
 }
 
@@ -1746,6 +1756,10 @@ void  OS_Sched (void)       //task和task之間切換
     OS_ENTER_CRITICAL();
     if (OSIntNesting == 0u) {                          /* Schedule only if all ISRs done and ...       */   //沒有任何ISR發生時才做scheduling
         if (OSLockNesting == 0u) {                     /* ... scheduler is not locked                  */   //用來防止task被搶奪，把scheduler鎖住
+
+            
+
+
             OS_SchedNew();
             OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];//拿出最高priority的已ready task
 
@@ -1756,6 +1770,7 @@ void  OS_Sched (void)       //task和task之間切換
                         OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr,
                         (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime)),
                         (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime));
+                    OSSchedLock();  //只有即將執行的task不是idle task時，才將sched鎖住
                 }
                 else {
                     printf("%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)    \t%8d    \t%8d      \t%7d\n",
@@ -1763,20 +1778,17 @@ void  OS_Sched (void)       //task和task之間切換
                         (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime)),
                         (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime));
                 }
-                
 
-                if (OSPrioHighRdy != OS_TASK_IDLE_PRIO) {
-                    OSSchedLock();
-                    TaskSchedInfo[OSPrioHighRdy].TaskStartTime = TaskSchedInfo[OSPrioHighRdy].TaskStartTime + TaskSchedInfo[OSPrioHighRdy].TaskPeriodic;
-                    TaskSchedInfo[OSPrioHighRdy].TaskDeadline = TaskSchedInfo[OSPrioHighRdy].TaskStartTime + TaskSchedInfo[OSPrioHighRdy].TaskPeriodic;
-                    TaskSchedInfo[OSPrioHighRdy].TaskExpFinTime = TaskSchedInfo[OSPrioHighRdy].TaskStartTime + TaskSchedInfo[OSPrioHighRdy].TaskExecuteTime;
-                }
+                TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime = TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic;
+                TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline = TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic;
+                TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime = TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExecuteTime;
+
                 OSCtxSwCtr++;                          /* Increment context switch counter             */   //總共context switch幾次
 
 #if OS_TASK_PROFILE_EN > 0u
-                OSTCBCur->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task   當前最高priotity的task   */   
+                OSTCBCur->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task   當前最高priotity的task   */
 #endif              
-            //作業更改的部分   M11102140
+                //作業更改的部分   M11102140
 
 
                 
@@ -1820,6 +1832,21 @@ static  void  OS_SchedNew (void)
 
     y             = OSUnMapTbl[OSRdyGrp];
     OSPrioHighRdy = (INT8U)((y << 3u) + OSUnMapTbl[OSRdyTbl[y]]);
+
+    //M11102140 (HW2) (PARTIII) 作業更改部分
+    if (OSPrioHighRdy != OS_TASK_IDLE_PRIO) {
+        int MinTaskStartTime = 64;
+        for (int i = 0; i < TASK_NUMBER; i++) {
+            OS_TCB* ptcb = OSTCBPrioTbl[i];
+            if (TaskSchedInfo[i].TaskStartTime < MinTaskStartTime && TaskSchedInfo[i].TaskStartTime <= OSTime && ptcb->OSTCBDly == 0u) {
+                MinTaskStartTime = TaskSchedInfo[i].TaskStartTime;
+                OSPrioHighRdy = i;
+            }
+}
+    }
+
+    //M11102140 (HW2) (PARTIII) 作業更改部分
+
 #else                                            /* We support up to 256 tasks                         */
     INT8U     y;
     OS_PRIO  *ptbl;
