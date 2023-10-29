@@ -110,6 +110,7 @@ int  main (void)
     //Dynamic create the stack size
     Task_STK = malloc(TASK_NUMBER * sizeof(int*));
 
+    //M11102140 (HW2) (PARTIII) 穨э场だ
     //For each pointer, allocate stroage for an array of ints
     int n;
     for (n = 0; n < TASK_NUMBER; n++) {
@@ -124,7 +125,8 @@ int  main (void)
             &TaskParameter[n],
             (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
     }
-    
+    //M11102140 (HW2) (PARTIII) 穨э场だ
+
     /*
     OSTaskCreateExt( StartupTask,                               /* Create the startup task                              
                      0,
@@ -142,9 +144,9 @@ int  main (void)
                            &os_err);
 #endif
 */
-    //穨э场だ M11102140
+    //M11102140 (HW2) (PARTIII) 穨э场だ
     OSTimeSet(0);
-    //穨э场だ M11102140
+    //M11102140 (HW2) (PARTIII) 穨э场だ
     OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II)   */
 
 
@@ -153,24 +155,19 @@ int  main (void)
     }
 }
 
+//M11102140 (HW2) (PARTIII) 穨э场だ
 void task(void* p_arg)
 {
     task_para_set* task_data;
     task_data = p_arg;
 
     while (1) {
-        INT32U taskStart = OSTime;
-        //printf("task%d: tick_start = %d\n", task_data->TaskID, taskStart);
-
-        while (OSTime - taskStart < task_data->TaskExecuteTime) {
-            ;
+        while (TaskSchedInfo[OSPrioCur].TaskProcessedTime != task_data->TaskExecuteTime) {
         }
-
-        //printf("task%d: OSTime = %d\n", task_data->TaskID, OSTime);
-
-        OSTimeDly((TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime));
+        OSTimeDly((TaskSchedInfo[OSPrioCur].TaskDeadline - OSTime));
     }
 }
+//M11102140 (HW2) (PARTIII) 穨э场だ
 
 
 

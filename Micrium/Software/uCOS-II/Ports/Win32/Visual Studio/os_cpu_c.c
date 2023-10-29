@@ -689,9 +689,9 @@ void  OSStartHighRdy (void)
 
     OSTaskSwHook();
     OSRunning = 1;
-    //
+    //M11102140 (HW2) (PARTIII) 作業更改部分
     OSSchedLock();              //把scheduler鎖住，不讓其切換
-    //
+    //M11102140 (HW2) (PARTIII) 作業更改部分
     p_stk = (OS_TASK_STK *)OSTCBHighRdy->OSTCBStkPtr;                   /* OSTCBCur  = OSTCBHighRdy;                                */
                                                                         /* OSPrioCur = OSPrioHighRdy;                               */
     ResumeThread(p_stk->ThreadHandle);

@@ -57,7 +57,7 @@ void  OSTimeDly (INT32U ticks)
 #if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
     OS_CPU_SR  cpu_sr = 0u;
 #endif
-    //
+    //M11102140 (HW2) (PARTIII) 穨э场だ
     if (OSRunning == OS_TRUE) {                            /* Make sure multitasking is running        */
         OS_ENTER_CRITICAL();
         if (OSIntNesting == 0u) {                          /* Can't call from an ISR                   */
@@ -73,7 +73,7 @@ void  OSTimeDly (INT32U ticks)
             OS_EXIT_CRITICAL();
         }
     }
-    //
+    //M11102140 (HW2) (PARTIII) 穨э场だ
 
 
     if (OSIntNesting > 0u) {                     /* See if trying to call from an ISR                  */
@@ -84,7 +84,6 @@ void  OSTimeDly (INT32U ticks)
     }
     if (ticks > 0u) {                            /* 0 means no delay!                                  */
         OS_ENTER_CRITICAL();
-        
         y            =  OSTCBCur->OSTCBY;        /* Delay current task                                 */
         OSRdyTbl[y] &= (OS_PRIO)~OSTCBCur->OSTCBBitX;
         OS_TRACE_TASK_SUSPENDED(OSTCBCur);
@@ -94,8 +93,10 @@ void  OSTimeDly (INT32U ticks)
         OSTCBCur->OSTCBDly = ticks;              /* Load ticks in TCB                                  */
         OS_TRACE_TASK_DLY(ticks);
         OS_EXIT_CRITICAL();
-        OS_Sched();                              /* Find next task to run!                             */
     }
+    //M11102140 (HW2) (PARTIII) 穨э场だ
+    OS_Sched();                              /* Find next task to run!                             */
+    //M11102140 (HW2) (PARTIII) 穨э场だ
 }
 
 

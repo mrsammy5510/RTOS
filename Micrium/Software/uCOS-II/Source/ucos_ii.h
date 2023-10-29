@@ -92,12 +92,14 @@ typedef struct task_para_set {
 int TASK_NUMBER;        //Number of the input tasks
 /*Task structure*/
 
+//M11102140 (HW2) (PARTIII) 作業更改部分
 typedef struct task_sched_info {
     INT16U TaskStartTime;
     INT16U TaskExecuteTime;
     INT16U TaskPeriodic;
     INT16U TaskDeadline;
     INT16U TaskExpFinTime;
+    INT16U TaskProcessedTime;
 }task_sched_info;
 
 /*Dynamic Create the Stack Size*/
@@ -106,7 +108,7 @@ OS_STK** Task_STK;
 /*Create Task*/
 task_para_set TaskParameter[OS_MAX_TASKS];
 task_sched_info TaskSchedInfo[OS_MAX_TASKS];
-
+//M11102140 (HW2) (PARTIII) 作業更改部分
 
 
 #ifdef   OS_GLOBALS

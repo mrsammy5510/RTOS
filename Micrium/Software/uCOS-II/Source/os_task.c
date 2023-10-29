@@ -392,11 +392,8 @@ INT8U  OSTaskCreateExt (void   (*task)(void *p_arg),
         psp = OSTaskStkInit(task, p_arg, ptos, opt);           /* Initialize the task's stack          */   //﹍て–taskいstack
         err = OS_TCBInit(prio, psp, pbos, id, stk_size, pext, opt);     //﹍てTask Control Block
 
-        //穨э场だ m11102140
-        
 
-
-
+        //M11102140 (HW2) (PARTIII) 穨э场だ
         if (prio != OS_TASK_IDLE_PRIO) {                            //盢taskdelay籔OSTimeDlyぃ琌ぃ穝OS_Sched()
             task_para_set* taskPara = p_arg;
             OS_TCB* ptcb = OSTCBPrioTbl[prio];
@@ -406,6 +403,7 @@ INT8U  OSTaskCreateExt (void   (*task)(void *p_arg),
             TaskSchedInfo[prio].TaskPeriodic = taskPara->TaskPeriodic;
             TaskSchedInfo[prio].TaskDeadline = TaskSchedInfo[prio].TaskStartTime + TaskSchedInfo[prio].TaskPeriodic;
             TaskSchedInfo[prio].TaskExpFinTime = TaskSchedInfo[prio].TaskStartTime + TaskSchedInfo[prio].TaskExecuteTime;
+            TaskSchedInfo[prio].TaskProcessedTime = 0;
 
             if (taskPara->TaskArriveTime != 0) {
                 INT8U      y;
@@ -422,7 +420,7 @@ INT8U  OSTaskCreateExt (void   (*task)(void *p_arg),
 
             }
         }
-        //穨э场だ m11102140
+        //M11102140 (HW2) (PARTIII) 穨э场だ
 
         if (err == OS_ERR_NONE) {
             OS_TRACE_TASK_CREATE(OSTCBPrioTbl[prio]);           //承task
