@@ -64,9 +64,10 @@ static  OS_STK  StartupTaskStk[APP_CFG_STARTUP_TASK_STK_SIZE];
 *                                         FUNCTION PROTOTYPES
 *********************************************************************************************************
 */
-static void task1(void* p_arg);
-static void task2(void* p_arg);
-static  void  StartupTask (void  *p_arg);
+static void task(void* p_arg);
+//static void task1(void* p_arg);
+//static void task2(void* p_arg);
+static  void  StartupTask(void* p_arg);
 
 
 /*
@@ -108,34 +109,22 @@ int  main (void)
     //Dynamic create the stack size
     Task_STK = malloc(TASK_NUMBER * sizeof(int*));
 
+    //M11102140 (HW2) (PARTII) 穨э场だ
     //For each pointer, allocate stroage for an array of ints
     int n;
     for (n = 0; n < TASK_NUMBER; n++) {
         Task_STK[n] = malloc(TASK_STACKSIZE * sizeof(int));
+        OSTaskCreateExt(task,                                              //Create task
+            &TaskParameter[n],
+            &Task_STK[n][TASK_STACKSIZE - 1],
+            TaskParameter[n].TaskPriority,
+            TaskParameter[n].TaskID,
+            &Task_STK[n][0],
+            TASK_STACKSIZE,
+            &TaskParameter[n],
+            (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
     }
-    
-    
-
-    OSTaskCreateExt(task1,                                              //Create task 1
-                    &TaskParameter[0],
-                    &Task_STK[0][TASK_STACKSIZE - 1],
-                    TaskParameter[0].TaskPriority,
-                    TaskParameter[0].TaskID,
-                    &Task_STK[0][0],
-                    TASK_STACKSIZE,
-                    &TaskParameter[0],
-                    (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
-
-    OSTaskCreateExt(task2,                                              //Create task 2
-        &TaskParameter[1],
-        &Task_STK[1][TASK_STACKSIZE - 1],
-        TaskParameter[1].TaskPriority,
-        TaskParameter[1].TaskID,
-        &Task_STK[1][0],
-        TASK_STACKSIZE,
-        &TaskParameter[1],
-        (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
-    
+    //M11102140 (HW2) (PARTII) 穨э场だ
     /*
     OSTaskCreateExt( StartupTask,                               /* Create the startup task                              
                      0,
@@ -153,9 +142,9 @@ int  main (void)
                            &os_err);
 #endif
 */
-    //穨э场だ M11102140
+    //M11102140 (HW2) (PARTII) 穨э场だ
     OSTimeSet(0);
-    //穨э场だ M11102140
+    //M11102140 (HW2) (PARTII) 穨э场だ
     OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II)   */
 
 
@@ -164,34 +153,21 @@ int  main (void)
     }
 }
 
-
-void task1(void* p_arg) 
+//M11102140 (HW2) (PARTII) 穨э场だ
+void task(void* p_arg)
 {
     task_para_set* task_data;
     task_data = p_arg;
-    while (1) {
-        //printf("Tick: %d, Hello from task%d\n", OSTime, task_data->TaskID);
-        //if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
-            //fprintf(Output_fp, "Tick: %d, Hello from task%d\n", OSTime, task_data->TaskID);
-            //fclose(Output_fp);
-        //}
-        OSTimeDly(task_data->TaskPeriodic);
-    }
-}
 
-void task2(void* p_arg)
-{
-    task_para_set* task_data;
-    task_data = p_arg;
     while (1) {
-        //printf("Tick: %d, Hello from task%d\n", OSTime, task_data->TaskID);
-        //if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
-            //fprintf(Output_fp, "Tick: %d, Hello from task%d\n", OSTime, task_data->TaskID);
-            //fclose(Output_fp);
-        //}
-        OSTimeDly(task_data->TaskPeriodic);
+        while (TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskProcessedTime != task_data->TaskExecuteTime) {
+        }
+        TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskProcessedTime = 0;
+        OSTimeDly((TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskDeadline - OSTime));
     }
 }
+//M11102140 (HW2) (PARTII) 穨э场だ
+
 /*
 *********************************************************************************************************
 *                                            STARTUP TASK

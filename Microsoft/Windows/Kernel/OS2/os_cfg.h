@@ -43,7 +43,11 @@
 #define OS_MAX_FLAGS              5u   /* Max. number of Event Flag Groups    in your application      */
 #define OS_MAX_MEM_PART           5u   /* Max. number of memory partitions                             */
 #define OS_MAX_QS                 4u   /* Max. number of queue control blocks in your application      */
-#define OS_MAX_TASKS             20u   /* Max. number of tasks in your application, MUST be >= 2       */
+//#define OS_MAX_TASKS             20u   /* Max. number of tasks in your application, MUST be >= 2       */
+
+//M11102140 (HW2) (PARTII) 作業更改部分
+#define OS_MAX_TASKS             62u    //由於我將period直接改為priority，為預防有period大於20的task出現，故將上限改為62
+//M11102140 (HW2) (PARTII) 作業更改部分
 
 #define OS_SCHED_LOCK_EN          1u   /* Include code for OSSchedLock() and OSSchedUnlock()           */
 

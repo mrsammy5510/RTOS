@@ -363,7 +363,6 @@ INT8U  OSTaskCreateExt (void   (*task)(void *p_arg),
 #endif
 
 
-
 #ifdef OS_SAFETY_CRITICAL_IEC61508
     if (OSSafetyCriticalStartFlag == OS_TRUE) {
         OS_SAFETY_CRITICAL_EXCEPTION();
@@ -392,6 +391,36 @@ INT8U  OSTaskCreateExt (void   (*task)(void *p_arg),
 
         psp = OSTaskStkInit(task, p_arg, ptos, opt);           /* Initialize the task's stack          */   //初始化每個task中的stack
         err = OS_TCBInit(prio, psp, pbos, id, stk_size, pext, opt);     //初始化Task Control Block
+
+        //M11102140 (HW2) (PARTII) 作業更改部分
+        if (prio != OS_TASK_IDLE_PRIO) {                            //將task作delay，與OSTimeDly不同的是不重新作OS_Sched()
+            task_para_set* taskPara = p_arg;
+            OS_TCB* ptcb = OSTCBPrioTbl[prio];
+
+            TaskSchedInfo[id - 1].TaskStartTime = taskPara->TaskArriveTime;
+            TaskSchedInfo[id - 1].TaskExecuteTime = taskPara->TaskExecuteTime;
+            TaskSchedInfo[id - 1].TaskPeriodic = taskPara->TaskPeriodic;
+            TaskSchedInfo[id - 1].TaskDeadline = TaskSchedInfo[id - 1].TaskStartTime + TaskSchedInfo[id - 1].TaskPeriodic;
+            TaskSchedInfo[id - 1].TaskExpFinTime = TaskSchedInfo[id - 1].TaskStartTime + TaskSchedInfo[id - 1].TaskExecuteTime;
+            TaskSchedInfo[id - 1].TaskProcessedTime = 0;
+
+            if (taskPara->TaskArriveTime != 0) {
+                INT8U      y;
+                OS_ENTER_CRITICAL();
+                y = ptcb->OSTCBY;
+                OSRdyTbl[y] &= (OS_PRIO)~ptcb->OSTCBBitX;
+                OS_TRACE_TASK_SUSPENDED(ptcb);
+                if (OSRdyTbl[y] == 0u) {
+                    OSRdyGrp &= (OS_PRIO)~ptcb->OSTCBBitY;
+                }
+                ptcb->OSTCBDly = taskPara->TaskArriveTime;
+                OS_TRACE_TASK_DLY(taskPara->TaskArriveTime);
+                OS_EXIT_CRITICAL();
+
+            }
+        }
+        //M11102140 (HW2) (PARTII) 作業更改部分
+
         if (err == OS_ERR_NONE) {
             OS_TRACE_TASK_CREATE(OSTCBPrioTbl[prio]);           //創建task
             if (OSRunning == OS_TRUE) {                        /* Find HPT if multitasking has started */

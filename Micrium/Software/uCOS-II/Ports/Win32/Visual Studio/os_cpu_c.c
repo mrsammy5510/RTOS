@@ -623,7 +623,7 @@ void  OSTCBInitHook (OS_TCB  *p_tcb)
     }
 
 #if (OS_MSG_TRACE > 0u)
-    OS_Printf("Task[%3.1d] created, Thread ID %5.0d\n", p_tcb->OSTCBPrio, p_stk->ThreadID);
+    //OS_Printf("Task[%3.1d] created, Thread ID %5.0d\n", p_tcb->OSTCBPrio, p_stk->ThreadID);
 #endif
 
     p_stk->TaskState = STATE_CREATED;
@@ -689,7 +689,6 @@ void  OSStartHighRdy (void)
 
     OSTaskSwHook();
     OSRunning = 1;
-
     p_stk = (OS_TASK_STK *)OSTCBHighRdy->OSTCBStkPtr;                   /* OSTCBCur  = OSTCBHighRdy;                                */
                                                                         /* OSPrioCur = OSPrioHighRdy;                               */
     ResumeThread(p_stk->ThreadHandle);

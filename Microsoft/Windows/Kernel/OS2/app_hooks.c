@@ -141,7 +141,9 @@ void InputFile()
             i++;
         }
         // Initial Priority
-        TaskParameter[j].TaskPriority = j + 1;
+        //M11102140 (HW2) (PARTII) 作業更改部分
+        TaskParameter[j].TaskPriority = TaskParameter[j].TaskPeriodic;
+        //M11102140 (HW2) (PARTII) 作業更改部分
         j++;
     }
     fclose(fp);
