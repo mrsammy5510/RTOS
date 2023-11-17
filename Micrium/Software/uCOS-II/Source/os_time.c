@@ -57,25 +57,7 @@ void  OSTimeDly (INT32U ticks)
 #if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
     OS_CPU_SR  cpu_sr = 0u;
 #endif
-    //M11102140 (HW2) (PARTIII) 穨э场だ
-    if (OSRunning == OS_TRUE) {                            /* Make sure multitasking is running        */
-        OS_ENTER_CRITICAL();
-        if (OSIntNesting == 0u) {                          /* Can't call from an ISR                   */
-            if (OSLockNesting > 0u) {                      /* Do not decrement if already 0            */
-                OSLockNesting--;                           /* Decrement lock nesting level             */
-                OS_EXIT_CRITICAL();
-            }
-            else {
-                OS_EXIT_CRITICAL();
-            }
-        }
-        else {
-            OS_EXIT_CRITICAL();
-        }
-    }
-    //M11102140 (HW2) (PARTIII) 穨э场だ
-
-
+   
     if (OSIntNesting > 0u) {                     /* See if trying to call from an ISR                  */
         return;
     }
@@ -94,9 +76,13 @@ void  OSTimeDly (INT32U ticks)
         OS_TRACE_TASK_DLY(ticks);
         OS_EXIT_CRITICAL();
     }
-    //M11102140 (HW2) (PARTIII) 穨э场だ
+    //M11102140 (PA2) (PARTI) 穨э场だ
+    TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime = TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic;
+    TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline = TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic;
+    TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime = TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExecuteTime;
+    TaskSchedInfo[OSPrioCur].TaskProcessedTime = 0;
     OS_Sched();                              /* Find next task to run!                             */
-    //M11102140 (HW2) (PARTIII) 穨э场だ
+    //M11102140 (PA2) (PARTI) 穨э场だ
 }
 
 

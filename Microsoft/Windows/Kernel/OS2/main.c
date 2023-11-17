@@ -65,8 +65,6 @@ static  OS_STK  StartupTaskStk[APP_CFG_STARTUP_TASK_STK_SIZE];
 *********************************************************************************************************
 */
 static void task(void* p_arg);
-//static void task1(void* p_arg);
-//static void task2(void* p_arg);
 static  void  StartupTask (void  *p_arg);
 
 
@@ -110,7 +108,7 @@ int  main (void)
     //Dynamic create the stack size
     Task_STK = malloc(TASK_NUMBER * sizeof(int*));
 
-    //M11102140 (HW2) (PARTIII) 穨э场だ
+    //M11102140 (PA2) (PARTI) 穨э场だ
     //For each pointer, allocate stroage for an array of ints
     int n;
     for (n = 0; n < TASK_NUMBER; n++) {
@@ -125,7 +123,7 @@ int  main (void)
             &TaskParameter[n],
             (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
     }
-    //M11102140 (HW2) (PARTIII) 穨э场だ
+    //M11102140 (PA2) (PARTI) 穨э场だ
 
     /*
     OSTaskCreateExt( StartupTask,                               /* Create the startup task                              
@@ -144,9 +142,9 @@ int  main (void)
                            &os_err);
 #endif
 */
-    //M11102140 (HW2) (PARTIII) 穨э场だ
+    //M11102140 (PA2) (PARTI) 穨э场だ
     OSTimeSet(0);
-    //M11102140 (HW2) (PARTIII) 穨э场だ
+    //M11102140 (PA2) (PARTI) 穨э场だ
     OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II)   */
 
 
@@ -155,7 +153,7 @@ int  main (void)
     }
 }
 
-//M11102140 (HW2) (PARTIII) 穨э场だ
+//M11102140 (PA2) (PARTI) 穨э场だ
 void task(void* p_arg)
 {
     task_para_set* task_data;
@@ -167,7 +165,7 @@ void task(void* p_arg)
         OSTimeDly((TaskSchedInfo[OSPrioCur].TaskDeadline - OSTime));
     }
 }
-//M11102140 (HW2) (PARTIII) 穨э场だ
+//M11102140 (PA2) (PARTI) 穨э场だ
 
 
 
