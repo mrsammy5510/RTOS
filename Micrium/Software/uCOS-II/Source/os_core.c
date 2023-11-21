@@ -1784,20 +1784,38 @@ void  OS_Sched (void)       //task㎝taskぇ丁ち传
             OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];//程蔼priorityready task
            
             //M11102140 (PA2) (PARTI) 穨э场だ
-            if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy     */
+            //if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy     */
                 if (OSPrioHighRdy != OS_TASK_IDLE_PRIO) {
-                    printf("%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t%7d\n",
-                        OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr,
-                        (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime) + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic),
-                        (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime) - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic);
 
-                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
-                        fprintf(Output_fp, "%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t%7d\n",
+                    if (OSPrioHighRdy == OSPrioCur) {
+                        printf("%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t%7d\n",
+                            OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr + 1,
+                            (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime) + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic),
+                            (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime) - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic);
+
+                        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                            fprintf(Output_fp, "%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t%7d\n",
+                                OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr + 1,
+                                (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime) + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic),
+                                (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic));
+                            fclose(Output_fp);
+                        }
+                    }
+                    else {
+                        printf("%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t%7d\n",
                             OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr,
                             (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime) + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic),
-                            (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic));
-                        fclose(Output_fp);
+                            (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime) - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic);
+
+                        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                            fprintf(Output_fp, "%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t%7d\n",
+                                OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr,
+                                (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime) + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic),
+                                (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic));
+                            fclose(Output_fp);
+                        }
                     }
+                    
                 }
                 else {
                     printf("%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)    \t%8d    \t%8d      \t%7d\n",
@@ -1833,7 +1851,7 @@ void  OS_Sched (void)       //task㎝taskぇ丁ち传
                 
 
                 OS_TASK_SW();                          /* Perform a context switch                     */
-            }
+            //}
         }
     }
     OS_EXIT_CRITICAL();
@@ -1869,9 +1887,9 @@ static  void  OS_SchedNew (void)
     //M11102140 (PA2) (PARTI) 穨э场だ
     if (OSPrioHighRdy != OS_TASK_IDLE_PRIO) {
         int MinTaskDeadline = 64;
-        for (int i = 0; i < TASK_NUMBER; i++) {         //iprio
+        for (int i = TASK_NUMBER - 1; i >= 0; i--) {         //iprio
             OS_TCB* ptcb = OSTCBPrioTbl[i];
-            if (TaskSchedInfo[i].TaskDeadline < MinTaskDeadline && TaskSchedInfo[i].TaskStartTime <= OSTime && ptcb->OSTCBDly == 0u) {
+            if (TaskSchedInfo[i].TaskDeadline <= MinTaskDeadline && TaskSchedInfo[i].TaskStartTime <= OSTime && ptcb->OSTCBDly == 0u) {
                 MinTaskDeadline = TaskSchedInfo[i].TaskDeadline;
                 OSPrioHighRdy = i;
             }
