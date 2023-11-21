@@ -393,10 +393,11 @@ INT8U  OSTaskCreateExt (void   (*task)(void *p_arg),
         err = OS_TCBInit(prio, psp, pbos, id, stk_size, pext, opt);     //初始化Task Control Block
 
 
-        //M11102140 (PA2) (PARTI) 作業更改部分
-        if (prio != OS_TASK_IDLE_PRIO) {                            //將task作delay，與OSTimeDly不同的是不重新作OS_Sched()
-            task_para_set* taskPara = p_arg;
-            OS_TCB* ptcb = OSTCBPrioTbl[prio];
+        //M11102140 (PA2) (PARTII) 作業更改部分
+        task_para_set* taskPara = p_arg;
+        OS_TCB* ptcb = OSTCBPrioTbl[prio];
+
+        if (prio != OS_TASK_IDLE_PRIO && prio != TASK_NUMBER - 1) {                            //將task作delay，與OSTimeDly不同的是不重新作OS_Sched()。
 
             TaskSchedInfo[prio].TaskStartTime = taskPara->TaskArriveTime;
             TaskSchedInfo[prio].TaskExecuteTime = taskPara->TaskExecuteTime;

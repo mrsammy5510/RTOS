@@ -113,9 +113,87 @@ void InputFile()
     char* ptr;
     char* pTmp = NULL;
     int TaskInfo[INFO], i, j = 0;
+    int task_number = 0;
     TASK_NUMBER = 0;
 
+    while (!feof(fp)) {
+        memset(str, 0, sizeof(str));
+        fgets(str, sizeof(str) - 1, fp);
+        ptr = strtok_s(str, " ", &pTmp);
+        task_number++;
+    }
+    fclose(fp);
+
+    if ((err = fopen_s(&fp, INPUT_FILE_NAME, "r")) == 0) {     
+        printf("the file 'TaskSet.txt' was opened\n");
+    }
+    else {
+        printf("The file 'Taskset.txt' was not opened\n");
+    }
+
     while (!feof(fp)){
+        i = 0;
+        memset(str, 0, sizeof(str));
+        fgets(str, sizeof(str) - 1, fp);
+        ptr = strtok_s(str, " ", &pTmp);
+        while (ptr != NULL) {
+            
+            TaskInfo[i] = atoi(ptr);
+            ptr = strtok_s(NULL, " ", &pTmp);
+
+            if (j != task_number - 1) {
+                if (i == 0) {                                           //Each row  is a new task
+                    TASK_NUMBER++;
+                    TaskParameter[j].TaskID = TASK_NUMBER;              //j = task ID
+                }
+                else if (i == 1) {
+                    TaskParameter[j].TaskArriveTime = TaskInfo[i];
+                }
+                else if (i == 2) {
+                    TaskParameter[j].TaskExecuteTime = TaskInfo[i];
+                }
+                else if (i == 3) {
+                    TaskParameter[j].TaskPeriodic = TaskInfo[i];
+                }
+
+                i++;
+            }
+            else{
+                if (i == 0) {
+                    TASK_NUMBER++;
+                    serverInfo.serverID = TASK_NUMBER;
+                }
+                else if (i == 1) {
+                    serverInfo.serversize = TaskInfo[i];
+                    serverInfo.deadline = 0;
+                    serverInfo.es = 0;
+                    serverInfo.curJobNumber = 0;
+                }
+                i++;
+            }
+            
+        }
+        // Initial Priority
+        if (j != task_number - 1) {
+            TaskParameter[j].TaskPriority = j;
+            j++;
+        }
+
+    }
+    fclose(fp);
+    //Read file
+    APE_JOB_NUMBER = 0;
+
+    if ((err = fopen_s(&fp, "./AperiodicJobs.txt", "r")) == 0) {     //task set 1 - 4
+        printf("the file 'AperiodicJobs.txt' was opened\n");
+    }
+    else {
+        printf("The file 'AperiodicJobs.txt' was not opened\n");
+    }
+
+    j = 0;
+
+    while (!feof(fp)) {
         i = 0;
         memset(str, 0, sizeof(str));
         fgets(str, sizeof(str) - 1, fp);
@@ -125,27 +203,26 @@ void InputFile()
             ptr = strtok_s(NULL, " ", &pTmp);
 
             if (i == 0) {                                           //Each row  is a new task
-                TASK_NUMBER++;
-                TaskParameter[j].TaskID = TASK_NUMBER;              //j = task ID
+                APE_JOB_NUMBER++;
+                Ape_tasks[j].AperiodicJobID = APE_JOB_NUMBER;              //j = task ID
             }
             else if (i == 1) {
-                TaskParameter[j].TaskArriveTime = TaskInfo[i];
+                Ape_tasks[j].AperiodicJobArriveTime = TaskInfo[i];
             }
             else if (i == 2) {
-                TaskParameter[j].TaskExecuteTime = TaskInfo[i];
+                Ape_tasks[j].AperiodicJobExecuteTime = TaskInfo[i];
             }
             else if (i == 3) {
-                TaskParameter[j].TaskPeriodic = TaskInfo[i];
+                Ape_tasks[j].AperiodicJobAbsDeadline = TaskInfo[i];
             }
 
             i++;
         }
-        // Initial Priority
-        TaskParameter[j].TaskPriority = j;
         j++;
     }
     fclose(fp);
     //Read file
+
 }
 /*
 *********************************************************************************************************

@@ -91,6 +91,8 @@ typedef struct task_para_set {
     INT16U TaskPriority;
 } task_para_set;
 
+
+
 int TASK_NUMBER;        //Number of the input tasks
 /*Task structure*/
 
@@ -104,12 +106,33 @@ typedef struct task_sched_info {
     INT16U TaskProcessedTime;
 }task_sched_info;
 
+typedef struct aperiodic_job_para_set {
+    INT16U AperiodicJobID;
+    INT16U AperiodicJobArriveTime;
+    INT16U AperiodicJobExecuteTime;
+    INT16U AperiodicJobAbsDeadline;
+}ape_job_para_set;
+
+typedef struct server_info {
+    INT16U serverID;
+    INT16U serversize;
+    INT16U es;
+    INT16U curJobNumber;
+    INT16U deadline;
+    ape_job_para_set ape_job_queue[OS_MAX_TASKS];
+}server_info;
+
+int APE_JOB_NUMBER;
+int now_process_ape_job_number;
+
 /*Dynamic Create the Stack Size*/
 OS_STK** Task_STK;
 
 /*Create Task*/
 task_para_set TaskParameter[OS_MAX_TASKS];
 task_sched_info TaskSchedInfo[OS_MAX_TASKS];
+ape_job_para_set Ape_tasks[OS_MAX_TASKS];
+server_info serverInfo;
 //M11102140 (PA2) (PARTI) 作業更改部分
 
 

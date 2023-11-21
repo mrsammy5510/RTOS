@@ -1,3 +1,5 @@
 ﻿  os_core.c
-C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(1008,13): warning C4013: 'exit' 未定義; 假設 extern 傳回整數
+C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(710,50): warning C4244: '=': 將 'float' 轉換為 'INT16U'，由於類型不同，可能導致資料遺失
+C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(756,46): warning C4244: '=': 將 'float' 轉換為 'INT16U'，由於類型不同，可能導致資料遺失
+C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(1083,13): warning C4013: 'exit' 未定義; 假設 extern 傳回整數
   OS2.vcxproj -> C:\Master_stuff\112-1\RTOS\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe

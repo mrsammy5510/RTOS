@@ -65,6 +65,7 @@ static  OS_STK  StartupTaskStk[APP_CFG_STARTUP_TASK_STK_SIZE];
 *********************************************************************************************************
 */
 static void task(void* p_arg);
+static void CUSServer(void* p_arg);
 static  void  StartupTask (void  *p_arg);
 
 
@@ -111,7 +112,7 @@ int  main (void)
     //M11102140 (PA2) (PARTI) 作業更改部分
     //For each pointer, allocate stroage for an array of ints
     int n;
-    for (n = 0; n < TASK_NUMBER; n++) {
+    for (n = 0; n < TASK_NUMBER - 1; n++) {
         Task_STK[n] = malloc(TASK_STACKSIZE * sizeof(int));
         OSTaskCreateExt(task,                                              //Create task
             &TaskParameter[n],
@@ -123,6 +124,17 @@ int  main (void)
             &TaskParameter[n],
             (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
     }
+    Task_STK[n] = malloc(TASK_STACKSIZE * sizeof(int));
+    OSTaskCreateExt(CUSServer,                                              //Create task
+        &serverInfo,
+        &Task_STK[n][TASK_STACKSIZE - 1],
+        serverInfo.serverID - 1,
+        serverInfo.serverID,
+        &Task_STK[n][0],
+        TASK_STACKSIZE,
+        &serverInfo,
+        (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
+
     //M11102140 (PA2) (PARTI) 作業更改部分
 
     /*
@@ -165,6 +177,21 @@ void task(void* p_arg)
         OSTimeDly((TaskSchedInfo[OSPrioCur].TaskDeadline - OSTime));
     }
 }
+
+void CUSServer(void* p_arg)
+{
+    server_info* server_data;
+    server_data = p_arg;
+
+    while (1) {
+        while (server_data->es != 0) {
+        }
+        
+        OS_Sched();
+    }
+}
+
+
 //M11102140 (PA2) (PARTI) 作業更改部分
 
 

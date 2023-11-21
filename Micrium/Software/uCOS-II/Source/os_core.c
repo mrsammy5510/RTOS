@@ -703,8 +703,79 @@ void  OSIntExit (void)          //從ISR轉到普通task
         if (OSIntNesting > 0u) {                           /* Prevent OSIntNesting from wrapping       */
             OSIntNesting--;
         }
-        //M11102140 (PA2) (PARTI) 作業更改部分
-        if (OSPrioCur != OS_TASK_IDLE_PRIO) {
+        //M11102140 (PA2) (PARTII) 作業更改部分
+        for (int i = 0; i < APE_JOB_NUMBER; i++) {
+            if (Ape_tasks[i].AperiodicJobArriveTime == OSTime) {
+                if (OSTime >= serverInfo.deadline) {
+                    serverInfo.deadline = OSTime + (float)Ape_tasks[i].AperiodicJobExecuteTime / ((float)serverInfo.serversize / 100);
+                    serverInfo.es = Ape_tasks[i].AperiodicJobExecuteTime;
+                    printf("%2d  \tAperiodic job(%d) arrives and sets CUS server's deadline as %2d.\n", OSTime, i, serverInfo.deadline);
+                    serverInfo.ape_job_queue[now_process_ape_job_number] = Ape_tasks[i];
+                    serverInfo.curJobNumber++;
+
+                    OS_TCB* ptcb;
+                    ptcb = OSTCBPrioTbl[TASK_NUMBER - 1];
+
+                    if ((ptcb->OSTCBStat & OS_STAT_SUSPEND) != OS_STAT_RDY) {
+                        ptcb->OSTCBStat &= (INT8U)~(INT8U)OS_STAT_SUSPEND;    
+                        if ((ptcb->OSTCBStat & OS_STAT_PEND_ANY) == OS_STAT_RDY) { 
+                            if (ptcb->OSTCBDly == 0u) {
+                                OSRdyGrp |= ptcb->OSTCBBitY;    
+                                OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
+                                OS_TRACE_TASK_READY(ptcb);
+                                OS_EXIT_CRITICAL();
+                            }
+                        }
+                    }
+                }
+                else{
+                    printf("%2d  \tAperiodic job(%d) arrives. Do nothing.\n", OSTime, i);
+                    serverInfo.curJobNumber++;
+
+                    OS_TCB* ptcb;
+                    ptcb = OSTCBPrioTbl[TASK_NUMBER - 1];
+
+                    if ((ptcb->OSTCBStat & OS_STAT_SUSPEND) != OS_STAT_RDY) {
+                        ptcb->OSTCBStat &= (INT8U)~(INT8U)OS_STAT_SUSPEND;
+                        if ((ptcb->OSTCBStat & OS_STAT_PEND_ANY) == OS_STAT_RDY) {
+                            if (ptcb->OSTCBDly == 0u) {
+                                OSRdyGrp |= ptcb->OSTCBBitY;
+                                OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
+                                OS_TRACE_TASK_READY(ptcb);
+                                OS_EXIT_CRITICAL();
+                            }
+                        }
+                    }
+                }
+                
+            }
+        }
+
+        if (serverInfo.deadline == OSTime) {
+            if (serverInfo.curJobNumber != 0) {
+                serverInfo.deadline = OSTime + (float)Ape_tasks[now_process_ape_job_number].AperiodicJobExecuteTime / ((float)serverInfo.serversize / 100);
+                serverInfo.es = Ape_tasks[now_process_ape_job_number].AperiodicJobExecuteTime;
+                printf("%2d  \tAperiodic job(%d) sets CUS server's deadline as %2d\n", OSTime, now_process_ape_job_number, serverInfo.deadline);
+
+                OS_TCB* ptcb;
+                ptcb = OSTCBPrioTbl[TASK_NUMBER - 1];
+
+                if ((ptcb->OSTCBStat & OS_STAT_SUSPEND) != OS_STAT_RDY) {
+                    ptcb->OSTCBStat &= (INT8U)~(INT8U)OS_STAT_SUSPEND;
+                    if ((ptcb->OSTCBStat & OS_STAT_PEND_ANY) == OS_STAT_RDY) {
+                        if (ptcb->OSTCBDly == 0u) {
+                            OSRdyGrp |= ptcb->OSTCBBitY;
+                            OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
+                            OS_TRACE_TASK_READY(ptcb);
+                            OS_EXIT_CRITICAL();
+                        }
+                    }
+                }
+            }
+        }
+
+        
+        if (OSPrioCur != OS_TASK_IDLE_PRIO && OSPrioCur != TASK_NUMBER - 1) {
             TaskSchedInfo[OSPrioCur].TaskProcessedTime++;
             if (TaskSchedInfo[OSPrioCur].TaskProcessedTime == TaskSchedInfo[OSPrioCur].TaskExecuteTime) {
                 OSTCBHighRdy = OSTCBCur;        //由於OSIntCurTaskResume()函式中是將OSTCBHighRdy作為繼續執行的task
@@ -712,6 +783,7 @@ void  OSIntExit (void)          //從ISR轉到普通task
                 return;
             }
         }
+
         //M11102140 (PA2) (PARTI) 作業更改部分
 
         if (OSIntNesting == 0u) {                          /* Reschedule only if all ISRs complete ... */
@@ -720,6 +792,9 @@ void  OSIntExit (void)          //從ISR轉到普通task
                 OS_SchedNew();
                 OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];
 
+                if (OSPrioCur == TASK_NUMBER - 1) {
+                    serverInfo.es--;
+                }
 
                 if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy */
 
@@ -1060,7 +1135,7 @@ void  OSTimeTick (void)
 
         //M11102140 (PA2) (PARTI) 作業更改部分
         OS_ENTER_CRITICAL();
-        for (int i = 0; i < TASK_NUMBER; i++) {
+        for (int i = 0; i < TASK_NUMBER - 1; i++) {
             if (OSTime > TaskSchedInfo[i].TaskDeadline) {
                 printf("%2d  \tMissDeadline      task(%2d)(%2d)  ------------\n", OSTime - 1, OSTCBPrioTbl[i]->OSTCBId, OSTCBPrioTbl[i]->OSTCBCtxSwCtr);
                 if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
@@ -1774,7 +1849,7 @@ void  OS_Sched (void)       //task和task之間切換
     OS_CPU_SR  cpu_sr = 0u;                             //用來回復critical section前的interrupt狀態
 #endif
 
-
+    
     
     OS_ENTER_CRITICAL();
     if (OSIntNesting == 0u) {                          /* Schedule only if all ISRs done and ...       */   //沒有任何ISR發生時才做scheduling
@@ -1785,7 +1860,29 @@ void  OS_Sched (void)       //task和task之間切換
            
             //M11102140 (PA2) (PARTI) 作業更改部分
             if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy     */
-                if (OSPrioHighRdy != OS_TASK_IDLE_PRIO) {
+
+                if (OSPrioCur == TASK_NUMBER - 1) {
+                    printf("%2d  \tAperiodic job(%d) is finished.\n", OSTime, now_process_ape_job_number);
+                    printf("%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t    N/A\n",
+                        OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr, OSTime - Ape_tasks[now_process_ape_job_number].AperiodicJobArriveTime
+                        , OSTime - Ape_tasks[now_process_ape_job_number].AperiodicJobArriveTime - Ape_tasks[now_process_ape_job_number].AperiodicJobExecuteTime);
+                    now_process_ape_job_number++;
+                    serverInfo.curJobNumber--;
+                    if (serverInfo.curJobNumber == 0) {
+                        OS_TCB* ptcb;
+                        INT8U      y;
+                        ptcb = OSTCBPrioTbl[TASK_NUMBER - 1];
+                        OS_ENTER_CRITICAL();
+                        y = ptcb->OSTCBY;
+                        OSRdyTbl[y] &= (OS_PRIO)~ptcb->OSTCBBitX;                   /* Make task not ready                 */
+                        if (OSRdyTbl[y] == 0u) {
+                            OSRdyGrp &= (OS_PRIO)~ptcb->OSTCBBitY;
+                        }
+                        ptcb->OSTCBStat |= OS_STAT_SUSPEND;                         /* Status of task is 'SUSPENDED'       */
+                        OS_EXIT_CRITICAL();
+                    }
+                }
+                else if (OSPrioHighRdy != OS_TASK_IDLE_PRIO) {
                     printf("%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t%7d\n",
                         OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr,
                         (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime) + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic),
@@ -1869,13 +1966,16 @@ static  void  OS_SchedNew (void)
     //M11102140 (PA2) (PARTI) 作業更改部分
     if (OSPrioHighRdy != OS_TASK_IDLE_PRIO) {
         int MinTaskDeadline = 64;
-        for (int i = 0; i < TASK_NUMBER; i++) {         //i為prio
+        for (int i = 0; i < TASK_NUMBER - 1; i++) {         //i為prio
             OS_TCB* ptcb = OSTCBPrioTbl[i];
             if (TaskSchedInfo[i].TaskDeadline < MinTaskDeadline && TaskSchedInfo[i].TaskStartTime <= OSTime && ptcb->OSTCBDly == 0u) {
                 MinTaskDeadline = TaskSchedInfo[i].TaskDeadline;
                 OSPrioHighRdy = i;
             }
-}
+        }
+        if (serverInfo.es != 0 && serverInfo.deadline < MinTaskDeadline) {
+            OSPrioHighRdy = TASK_NUMBER - 1;
+        }
     }
 
     //M11102140 (PA2) (PARTI) 作業更改部分
