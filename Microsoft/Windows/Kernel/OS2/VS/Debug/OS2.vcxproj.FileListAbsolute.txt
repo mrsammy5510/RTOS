@@ -3,3 +3,4 @@ C:\Micrium_Win32_Kernel_Lab1\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe
 C:\Master_stuff\112-1\Micrium_Win32_Kernel_HW1\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe
 C:\RTOS-RTOS_HW2\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe
 C:\Master_stuff\112-1\RTOS\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe
+E:\Github\RTOS\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe

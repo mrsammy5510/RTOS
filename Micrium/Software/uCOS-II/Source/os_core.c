@@ -712,7 +712,6 @@ void  OSIntExit (void)          //眖ISR锣炊硄task
                 return;
             }
         }
-        //M11102140 (PA2) (PARTI) 穨э场だ
 
         if (OSIntNesting == 0u) {                          /* Reschedule only if all ISRs complete ... */
             if (OSLockNesting == 0u) {                     /* ... and not locked.                      */
@@ -742,16 +741,13 @@ void  OSIntExit (void)          //眖ISR锣炊硄task
                             fclose(Output_fp);
                         }
                     }
-                    //M11102140 (PA2) (PARTI) 穨э场だ
                     
-
-
                     OSCtxSwCtr++;                          /* Keep track of the number of ctx switches */
 
 #if OS_TASK_PROFILE_EN > 0u
                     //OSTCBCur->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task  */
 #endif              
-                    //M11102140 (PA2) (PARTI) 穨э场だ
+         //M11102140 (PA2) (PARTI) 穨э场だ
 
 
 #if OS_TASK_CREATE_EXT_EN > 0u
@@ -1784,57 +1780,56 @@ void  OS_Sched (void)       //task㎝taskぇ丁ち传
             OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];//程蔼priorityready task
            
             //M11102140 (PA2) (PARTI) 穨э场だ
-            //if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy     */
-                if (OSPrioHighRdy != OS_TASK_IDLE_PRIO) {
+            if (OSPrioHighRdy != OS_TASK_IDLE_PRIO) {
 
-                    if (OSPrioHighRdy == OSPrioCur) {
-                        printf("%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t%7d\n",
-                            OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr + 1,
-                            (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime) + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic),
-                            (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime) - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic);
-
-                        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
-                            fprintf(Output_fp, "%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t%7d\n",
-                                OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr + 1,
-                                (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime) + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic),
-                                (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic));
-                            fclose(Output_fp);
-                        }
-                    }
-                    else {
-                        printf("%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t%7d\n",
-                            OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr,
-                            (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime) + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic),
-                            (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime) - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic);
-
-                        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
-                            fprintf(Output_fp, "%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t%7d\n",
-                                OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr,
-                                (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime) + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic),
-                                (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic));
-                            fclose(Output_fp);
-                        }
-                    }
-                    
-                }
-                else {
-                    printf("%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)    \t%8d    \t%8d      \t%7d\n",
-                        OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBPrio,
-                        (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic), (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic),
-                        TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic);
+                if (OSPrioHighRdy == OSPrioCur) {
+                    printf("%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t%7d\n",
+                        OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr + 1,
+                        (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime) + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic),
+                        (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime) - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic);
 
                     if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
-                        fprintf(Output_fp, "%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)    \t%8d    \t%8d      \t%7d\n",
-                            OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBPrio,
-                            (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic), (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic),
-                            TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic);
+                        fprintf(Output_fp, "%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t%7d\n",
+                            OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr + 1,
+                            (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime) + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic),
+                            (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic));
                         fclose(Output_fp);
                     }
                 }
+                else {
+                    printf("%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t%7d\n",
+                        OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr,
+                        (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime) + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic),
+                        (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime) - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic);
+
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t%7d\n",
+                            OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr,
+                            (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime) + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic),
+                            (TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic));
+                        fclose(Output_fp);
+                    }
+                }
+                    
+            }
+            else {
+                printf("%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)    \t%8d    \t%8d      \t%7d\n",
+                    OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBPrio,
+                    (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic), (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic),
+                    TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic);
+
+                if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                    fprintf(Output_fp, "%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)    \t%8d    \t%8d      \t%7d\n",
+                        OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBPrio,
+                        (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic), (OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskExpFinTime + TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic),
+                        TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskDeadline - OSTime - TaskSchedInfo[OSTCBCur->OSTCBPrio].TaskPeriodic);
+                    fclose(Output_fp);
+                }
+            }
 
                 
 
-                OSCtxSwCtr++;                          /* Increment context switch counter             */   //羆context switch碭Ω
+            OSCtxSwCtr++;                          /* Increment context switch counter             */   //羆context switch碭Ω
 
 #if OS_TASK_PROFILE_EN > 0u
                 OSTCBCur->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task   讽玡程蔼priotitytask   */
@@ -1851,7 +1846,7 @@ void  OS_Sched (void)       //task㎝taskぇ丁ち传
                 
 
                 OS_TASK_SW();                          /* Perform a context switch                     */
-            //}
+
         }
     }
     OS_EXIT_CRITICAL();
