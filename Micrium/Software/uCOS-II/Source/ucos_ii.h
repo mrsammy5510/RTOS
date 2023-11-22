@@ -63,17 +63,19 @@ extern "C" {
 *                                            MISCELLANEOUS
 *********************************************************************************************************
 */
-//M11102140 (PA2) (PARTI) 穨э场だ
+//M11102140 (PA2) (PARTII) 穨э场だ
 #define SYSTEM_END_TIME 40
-//M11102140 (PA2) (PARTI) 穨э场だ
+
 
 /*Input File*/
 FILE* fp;
 #define INPUT_FILE_NAME "./TaskSet.txt"
 #define OUTPUT_FILE_NAME "./Output.txt"
+#define APERIODIC_FILE_NAME "./Aperiodicjobs.txt"
 #define MAX 20      //Task maximum number
 #define INFO 4      //information of task
 /*Input File*/
+//M11102140 (PA2) (PARTII) 穨э场だ
 
 /*Output File*/
 FILE* Output_fp;
@@ -96,7 +98,7 @@ typedef struct task_para_set {
 int TASK_NUMBER;        //Number of the input tasks
 /*Task structure*/
 
-//M11102140 (PA2) (PARTI) 穨э场だ
+//M11102140 (PA2) (PARTII) 穨э场だ
 typedef struct task_sched_info {
     INT16U TaskStartTime;
     INT16U TaskExecuteTime;
@@ -133,7 +135,7 @@ task_para_set TaskParameter[OS_MAX_TASKS];
 task_sched_info TaskSchedInfo[OS_MAX_TASKS];
 ape_job_para_set Ape_tasks[OS_MAX_TASKS];
 server_info serverInfo;
-//M11102140 (PA2) (PARTI) 穨э场だ
+//M11102140 (PA2) (PARTII) 穨э场だ
 
 
 #ifdef   OS_GLOBALS

@@ -710,6 +710,10 @@ void  OSIntExit (void)          //眖ISR锣炊硄task
                     serverInfo.deadline = OSTime + (float)Ape_tasks[i].AperiodicJobExecuteTime / ((float)serverInfo.serversize / 100);
                     serverInfo.es = Ape_tasks[i].AperiodicJobExecuteTime;
                     printf("%2d  \tAperiodic job(%d) arrives and sets CUS server's deadline as %2d.\n", OSTime, i, serverInfo.deadline);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%2d  \tAperiodic job(%d) arrives and sets CUS server's deadline as %2d.\n", OSTime, i, serverInfo.deadline);
+                        fclose(Output_fp);
+                    }
                     serverInfo.ape_job_queue[now_process_ape_job_number] = Ape_tasks[i];
                     serverInfo.curJobNumber++;
 
@@ -730,6 +734,10 @@ void  OSIntExit (void)          //眖ISR锣炊硄task
                 }
                 else{
                     printf("%2d  \tAperiodic job(%d) arrives. Do nothing.\n", OSTime, i);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%2d  \tAperiodic job(%d) arrives. Do nothing.\n", OSTime, i);
+                        fclose(Output_fp);
+                    }
                     serverInfo.curJobNumber++;
 
                     OS_TCB* ptcb;
@@ -756,7 +764,10 @@ void  OSIntExit (void)          //眖ISR锣炊硄task
                 serverInfo.deadline = OSTime + (float)Ape_tasks[now_process_ape_job_number].AperiodicJobExecuteTime / ((float)serverInfo.serversize / 100);
                 serverInfo.es = Ape_tasks[now_process_ape_job_number].AperiodicJobExecuteTime;
                 printf("%2d  \tAperiodic job(%d) sets CUS server's deadline as %2d.\n", OSTime, now_process_ape_job_number, serverInfo.deadline);
-
+                if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                    fprintf(Output_fp, "%2d  \tAperiodic job(%d) sets CUS server's deadline as %2d.\n", OSTime, now_process_ape_job_number, serverInfo.deadline);
+                    fclose(Output_fp);
+                }
                 OS_TCB* ptcb;
                 ptcb = OSTCBPrioTbl[TASK_NUMBER - 1];
 
@@ -783,8 +794,6 @@ void  OSIntExit (void)          //眖ISR锣炊硄task
                 return;
             }
         }
-
-        //M11102140 (PA2) (PARTI) 穨э场だ
 
         if (OSIntNesting == 0u) {                          /* Reschedule only if all ISRs complete ... */
             if (OSLockNesting == 0u) {                     /* ... and not locked.                      */
@@ -817,7 +826,7 @@ void  OSIntExit (void)          //眖ISR锣炊硄task
                             fclose(Output_fp);
                         }
                     }
-                    //M11102140 (PA2) (PARTI) 穨э场だ
+
                     
 
 
@@ -1133,7 +1142,7 @@ void  OSTimeTick (void)
             OS_EXIT_CRITICAL();
         }
 
-        //M11102140 (PA2) (PARTI) 穨э场だ
+        //M11102140 (PA2) (PARTII) 穨э场だ
         OS_ENTER_CRITICAL();
         for (int i = 0; i < TASK_NUMBER - 1; i++) {
             if (OSTime > TaskSchedInfo[i].TaskDeadline) {
@@ -1146,7 +1155,7 @@ void  OSTimeTick (void)
             }
         }
         OS_EXIT_CRITICAL();
-        //M11102140 (PA2) (PARTI) 穨э场だ
+        //M11102140 (PA2) (PARTII) 穨э场だ
     }
 }
 
@@ -1858,14 +1867,36 @@ void  OS_Sched (void)       //task㎝taskぇ丁ち传
             OS_SchedNew();
             OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];//程蔼priorityready task
            
-            //M11102140 (PA2) (PARTI) 穨э场だ
-            
-
+            //M11102140 (PA2) (PARTII) 穨э场だ       
             if (OSPrioCur == TASK_NUMBER - 1) {
                 printf("%2d  \tAperiodic job(%d) is finished.\n", OSTime, now_process_ape_job_number);
-                printf("%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t    N/A\n",
-                    OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr, OSTime - Ape_tasks[now_process_ape_job_number].AperiodicJobArriveTime
-                    , OSTime - Ape_tasks[now_process_ape_job_number].AperiodicJobArriveTime - Ape_tasks[now_process_ape_job_number].AperiodicJobExecuteTime);
+                if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                    fprintf(Output_fp, "%2d  \tAperiodic job(%d) is finished.\n", OSTime, now_process_ape_job_number);
+                    fclose(Output_fp);
+                }
+
+                if (OSPrioHighRdy != OS_TASK_IDLE_PRIO) {
+                    printf("%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t    N/A\n",
+                        OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr, OSTime - Ape_tasks[now_process_ape_job_number].AperiodicJobArriveTime
+                        , OSTime - Ape_tasks[now_process_ape_job_number].AperiodicJobArriveTime - Ape_tasks[now_process_ape_job_number].AperiodicJobExecuteTime);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t    N/A\n",
+                            OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr, OSTime - Ape_tasks[now_process_ape_job_number].AperiodicJobArriveTime
+                            , OSTime - Ape_tasks[now_process_ape_job_number].AperiodicJobArriveTime - Ape_tasks[now_process_ape_job_number].AperiodicJobExecuteTime);
+                        fclose(Output_fp);
+                    }
+                }
+                else {
+                    printf("%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)     \t%8d    \t%8d      \t    N/A\n",
+                        OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBPrio, OSTime - Ape_tasks[now_process_ape_job_number].AperiodicJobArriveTime
+                        , OSTime - Ape_tasks[now_process_ape_job_number].AperiodicJobArriveTime - Ape_tasks[now_process_ape_job_number].AperiodicJobExecuteTime);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)     \t%8d    \t%8d      \t    N/A\n",
+                            OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBPrio, OSTime - Ape_tasks[now_process_ape_job_number].AperiodicJobArriveTime
+                            , OSTime - Ape_tasks[now_process_ape_job_number].AperiodicJobArriveTime - Ape_tasks[now_process_ape_job_number].AperiodicJobExecuteTime);
+                        fclose(Output_fp);
+                    }
+                }
                 now_process_ape_job_number++;
                 serverInfo.curJobNumber--;
                 if (serverInfo.curJobNumber == 0) {
@@ -1918,7 +1949,7 @@ void  OS_Sched (void)       //task㎝taskぇ丁ち传
 #if OS_TASK_PROFILE_EN > 0u
                 OSTCBCur->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task   讽玡程蔼priotitytask   */
 #endif              
-            //M11102140 (PA2) (PARTI) 穨э场だ
+            //M11102140 (PA2) (PARTII) 穨э场だ
 
 
                 
@@ -1963,7 +1994,7 @@ static  void  OS_SchedNew (void)
     y             = OSUnMapTbl[OSRdyGrp];
     OSPrioHighRdy = (INT8U)((y << 3u) + OSUnMapTbl[OSRdyTbl[y]]);
 
-    //M11102140 (PA2) (PARTI) 穨э场だ
+    //M11102140 (PA2) (PARTII) 穨э场だ
     if (OSPrioHighRdy != OS_TASK_IDLE_PRIO) {
         int MinTaskDeadline = 64;
         for (int i = TASK_NUMBER - 2; i >= 0; i--) {         //iprio
@@ -1978,7 +2009,7 @@ static  void  OS_SchedNew (void)
         }
     }
 
-    //M11102140 (PA2) (PARTI) 穨э场だ
+    //M11102140 (PA2) (PARTII) 穨э场だ
 
 #else                                            /* We support up to 256 tasks                         */
     INT8U     y;

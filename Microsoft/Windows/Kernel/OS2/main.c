@@ -64,10 +64,11 @@ static  OS_STK  StartupTaskStk[APP_CFG_STARTUP_TASK_STK_SIZE];
 *                                         FUNCTION PROTOTYPES
 *********************************************************************************************************
 */
+//M11102140 (PA2) (PARTII) 穨э场だ
 static void task(void* p_arg);
 static void CUSServer(void* p_arg);
 static  void  StartupTask (void  *p_arg);
-
+//M11102140 (PA2) (PARTII) 穨э场だ
 
 /*
 *********************************************************************************************************
@@ -109,7 +110,7 @@ int  main (void)
     //Dynamic create the stack size
     Task_STK = malloc(TASK_NUMBER * sizeof(int*));
 
-    //M11102140 (PA2) (PARTI) 穨э场だ
+    //M11102140 (PA2) (PARTII) 穨э场だ
     //For each pointer, allocate stroage for an array of ints
     int n;
     for (n = 0; n < TASK_NUMBER - 1; n++) {
@@ -135,7 +136,7 @@ int  main (void)
         &serverInfo,
         (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
 
-    //M11102140 (PA2) (PARTI) 穨э场だ
+    //M11102140 (PA2) (PARTII) 穨э场だ
 
     /*
     OSTaskCreateExt( StartupTask,                               /* Create the startup task                              
@@ -165,7 +166,7 @@ int  main (void)
     }
 }
 
-//M11102140 (PA2) (PARTI) 穨э场だ
+//M11102140 (PA2) (PARTII) 穨э场だ
 void task(void* p_arg)
 {
     task_para_set* task_data;
@@ -192,7 +193,7 @@ void CUSServer(void* p_arg)
 }
 
 
-//M11102140 (PA2) (PARTI) 穨э场だ
+//M11102140 (PA2) (PARTII) 穨э场だ
 
 
 

@@ -116,6 +116,7 @@ void InputFile()
     int task_number = 0;
     TASK_NUMBER = 0;
 
+    //M11102140 (PA2) (PARTII) 穨э场だ
     while (!feof(fp)) {
         memset(str, 0, sizeof(str));
         fgets(str, sizeof(str) - 1, fp);
@@ -131,6 +132,7 @@ void InputFile()
         printf("The file 'Taskset.txt' was not opened\n");
     }
 
+    
     while (!feof(fp)){
         i = 0;
         memset(str, 0, sizeof(str));
@@ -182,9 +184,12 @@ void InputFile()
     }
     fclose(fp);
     //Read file
+    //M11102140 (PA2) (PARTII) 穨э场だ
+    
+    //M11102140 (PA2) (PARTII) 穨э场だ
     APE_JOB_NUMBER = 0;
 
-    if ((err = fopen_s(&fp, "./AperiodicJobs.txt", "r")) == 0) {     //task set 1 - 4
+    if ((err = fopen_s(&fp, APERIODIC_FILE_NAME, "r")) == 0) {     //task set 1 - 4
         printf("the file 'AperiodicJobs.txt' was opened\n");
     }
     else {
@@ -222,7 +227,7 @@ void InputFile()
     }
     fclose(fp);
     //Read file
-
+    //M11102140 (PA2) (PARTII) 穨э场だ
 }
 /*
 *********************************************************************************************************

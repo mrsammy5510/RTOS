@@ -1,5 +1,26 @@
-﻿  os_core.c
-E:\Github\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(710,50): warning C4244: '=': 將 'float' 轉換為 'INT16U'，由於類型不同，可能導致資料遺失
-E:\Github\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(756,46): warning C4244: '=': 將 'float' 轉換為 'INT16U'，由於類型不同，可能導致資料遺失
-E:\Github\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(1083,13): warning C4013: 'exit' 未定義; 假設 extern 傳回整數
-  OS2.vcxproj -> E:\Github\RTOS\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe
+﻿  os_cpu_c.c
+  os_core.c
+C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(710,50): warning C4244: '=': 將 'float' 轉換為 'INT16U'，由於類型不同，可能導致資料遺失
+C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(764,46): warning C4244: '=': 將 'float' 轉換為 'INT16U'，由於類型不同，可能導致資料遺失
+C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(1092,13): warning C4013: 'exit' 未定義; 假設 extern 傳回整數
+  os_dbg_r.c
+  os_flag.c
+  os_mbox.c
+  os_mem.c
+  os_mutex.c
+  os_q.c
+  os_sem.c
+  os_task.c
+  os_time.c
+  os_tmr.c
+  app_hooks.c
+C:\Master_stuff\112-1\RTOS\Microsoft\Windows\Kernel\OS2\app_hooks.c(143,27): warning C4013: 'atoi' 未定義; 假設 extern 傳回整數
+  main.c
+C:\Master_stuff\112-1\RTOS\Microsoft\Windows\Kernel\OS2\main.c(111,16): warning C4013: 'malloc' 未定義; 假設 extern 傳回整數
+C:\Master_stuff\112-1\RTOS\Microsoft\Windows\Kernel\OS2\main.c(111,14): warning C4047: '=': 'OS_STK **' 與 'int' 間接取值的層級不同
+C:\Master_stuff\112-1\RTOS\Microsoft\Windows\Kernel\OS2\main.c(117,21): warning C4047: '=': 'OS_STK *' 與 'int' 間接取值的層級不同
+C:\Master_stuff\112-1\RTOS\Microsoft\Windows\Kernel\OS2\main.c(121,29): warning C4244: '函式': 將 'INT16U' 轉換為 'INT8U'，由於類型不同，可能導致資料遺失
+C:\Master_stuff\112-1\RTOS\Microsoft\Windows\Kernel\OS2\main.c(128,17): warning C4047: '=': 'OS_STK *' 與 'int' 間接取值的層級不同
+C:\Master_stuff\112-1\RTOS\Microsoft\Windows\Kernel\OS2\main.c(91,17): warning C4101: 'os_err': 未參考的區域變數
+  正在產生程式碼...
+  OS2.vcxproj -> C:\Master_stuff\112-1\RTOS\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe

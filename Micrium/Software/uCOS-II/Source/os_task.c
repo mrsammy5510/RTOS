@@ -421,7 +421,7 @@ INT8U  OSTaskCreateExt (void   (*task)(void *p_arg),
 
             }
         }
-        //M11102140 (PA2) (PARTI) 作業更改部分
+        //M11102140 (PA2) (PARTII) 作業更改部分
 
         if (err == OS_ERR_NONE) {
             OS_TRACE_TASK_CREATE(OSTCBPrioTbl[prio]);           //創建task
