@@ -137,6 +137,18 @@ void InputFile()
             else if (i == 3) {
                 TaskParameter[j].TaskPeriodic = TaskInfo[i];
             }
+            else if (i == 4) {
+                TaskParameter[j].LockR1 = TaskInfo[i];
+            }
+            else if (i == 5) {
+                TaskParameter[j].UnlockR1 = TaskInfo[i];
+            }
+            else if (i == 6) {
+                TaskParameter[j].LockR2 = TaskInfo[i];
+            }
+            else if (i == 7) {
+                TaskParameter[j].UnlockR2 = TaskInfo[i];
+            }
 
             i++;
         }

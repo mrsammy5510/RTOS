@@ -1,14 +1,8 @@
 ﻿  os_core.c
-C:\RTOS-Part-II\Micrium\Software\uCOS-II\Source\os_core.c(918,24): warning C4477: 'printf' : 格式字串 '%11x' 需要 'unsigned int' 類型的引數，但 variadic 引數 2 的類型為 'os_tcb *'
-C:\RTOS-Part-II\Micrium\Software\uCOS-II\Source\os_core.c(918,24): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 3 的類型為 'OS_TCB *'
-C:\RTOS-Part-II\Micrium\Software\uCOS-II\Source\os_core.c(918,24): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 4 的類型為 'os_tcb *'
-C:\RTOS-Part-II\Micrium\Software\uCOS-II\Source\os_core.c(921,24): warning C4477: 'printf' : 格式字串 '%11x' 需要 'unsigned int' 類型的引數，但 variadic 引數 2 的類型為 'os_tcb *'
-C:\RTOS-Part-II\Micrium\Software\uCOS-II\Source\os_core.c(921,24): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 3 的類型為 'OS_TCB *'
-C:\RTOS-Part-II\Micrium\Software\uCOS-II\Source\os_core.c(921,24): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 4 的類型為 'os_tcb *'
-C:\RTOS-Part-II\Micrium\Software\uCOS-II\Source\os_core.c(1014,13): warning C4013: 'exit' 未定義; 假設 extern 傳回整數
-C:\RTOS-Part-II\Micrium\Software\uCOS-II\Source\os_core.c(2252,20): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 2 的類型為 'OS_TCB *'
-C:\RTOS-Part-II\Micrium\Software\uCOS-II\Source\os_core.c(2256,20): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 2 的類型為 'OS_TCB *'
-C:\RTOS-Part-II\Micrium\Software\uCOS-II\Source\os_core.c(2259,16): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 1 的類型為 'os_tcb *'
-C:\RTOS-Part-II\Micrium\Software\uCOS-II\Source\os_core.c(2260,16): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 1 的類型為 'OS_TCB *'
-C:\RTOS-Part-II\Micrium\Software\uCOS-II\Source\os_core.c(2261,16): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 1 的類型為 'os_tcb *'
-  OS2.vcxproj -> C:\RTOS-Part-II\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe
+C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(1030,13): warning C4013: 'exit' 未定義; 假設 extern 傳回整數
+C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(2271,20): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 2 的類型為 'OS_TCB *'
+C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(2275,20): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 2 的類型為 'OS_TCB *'
+C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(2278,16): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 1 的類型為 'os_tcb *'
+C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(2279,16): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 1 的類型為 'OS_TCB *'
+C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(2280,16): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 1 的類型為 'os_tcb *'
+  OS2.vcxproj -> C:\Master_stuff\112-1\RTOS\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe

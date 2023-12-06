@@ -404,6 +404,14 @@ INT8U  OSTaskCreateExt (void   (*task)(void *p_arg),
             TaskSchedInfo[id - 1].TaskExpFinTime = TaskSchedInfo[id - 1].TaskStartTime + TaskSchedInfo[id - 1].TaskExecuteTime;
             TaskSchedInfo[id - 1].TaskProcessedTime = 0;
 
+            TaskSchedInfo[id - 1].HoldResNum = 0;
+            TaskSchedInfo[id - 1].LockR1 = taskPara->LockR1;
+            TaskSchedInfo[id - 1].UnlockR1 = taskPara->UnlockR1;
+            TaskSchedInfo[id - 1].LockR2 = taskPara->LockR2;
+            TaskSchedInfo[id - 1].UnlockR2 = taskPara->UnlockR2;
+            TaskSchedInfo[id - 1].BlockingTime = 0;
+            TaskSchedInfo[id - 1].PreemptionTime = 0;
+
             if (taskPara->TaskArriveTime != 0) {
                 INT8U      y;
                 OS_ENTER_CRITICAL();

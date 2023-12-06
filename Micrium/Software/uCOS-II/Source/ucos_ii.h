@@ -63,14 +63,14 @@ extern "C" {
 *                                            MISCELLANEOUS
 *********************************************************************************************************
 */
-#define SYSTEM_END_TIME 30
+#define SYSTEM_END_TIME 100
 
 /*Input File*/
 FILE* fp;
 #define INPUT_FILE_NAME "./TaskSet.txt"
 #define OUTPUT_FILE_NAME "./Output.txt"
 #define MAX 20      //Task maximum number
-#define INFO 4      //information of task
+#define INFO 10      //information of task
 /*Input File*/
 
 /*Output File*/
@@ -78,16 +78,22 @@ FILE* Output_fp;
 errno_t Output_err;
 /*Output File*/
 
-
+//M11102140 (PA3) (PARTI) 作業更改部分
 /*Task Structure*/
 typedef struct task_para_set {
     INT16U TaskID;
     INT16U TaskArriveTime;
     INT16U TaskExecuteTime;
     INT16U TaskPeriodic;
-    INT16U TaskNumber;
     INT16U TaskPriority;
+    
+    INT16U LockR1;
+    INT16U UnlockR1;
+    INT16U LockR2;
+    INT16U UnlockR2;
 } task_para_set;
+//M11102140 (PA3) (PARTI) 作業更改部分
+
 
 int TASK_NUMBER;        //Number of the input tasks
 /*Task structure*/
@@ -100,6 +106,14 @@ typedef struct task_sched_info {
     INT16U TaskDeadline;
     INT16U TaskExpFinTime;
     INT16U TaskProcessedTime;
+
+    INT16U HoldResNum;
+    INT16U LockR1;
+    INT16U UnlockR1;
+    INT16U LockR2;
+    INT16U UnlockR2;
+    INT16U BlockingTime;
+    INT16U PreemptionTime;
 }task_sched_info;
 //M11102140 (HW2) (PARTII) 作業更改部分
 

@@ -703,15 +703,55 @@ void  OSIntExit (void)          //從ISR轉到普通task
         if (OSIntNesting > 0u) {                           /* Prevent OSIntNesting from wrapping       */
             OSIntNesting--;
         }
-        //M11102140 (HW2) (PARTII) 作業更改部分
+
+        for (int i = 0; i < TASK_NUMBER; i++) {
+            if (OSTime > TaskSchedInfo[i].TaskStartTime) {      //此task已到來
+                //int MinLockTime = TaskSchedInfo[i].LockR1 < TaskSchedInfo[i].LockR2 ? TaskSchedInfo[i].LockR1 : TaskSchedInfo[i].LockR2;
+                if (TaskSchedInfo[i].TaskPeriodic < OSPrioCur) {        //被卡住的task的prio比當前高
+                    TaskSchedInfo[i].BlockingTime++;
+                }
+                if (TaskSchedInfo[i].TaskPeriodic > OSPrioCur) {        //被卡住的task的prio比當前低
+                    TaskSchedInfo[i].PreemptionTime++;
+                }
+            }
+        }
+
+
+        //M11102140 (PA3) (PARTI) 作業更改部分
         if (OSPrioCur != OS_TASK_IDLE_PRIO) {
             TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskProcessedTime++;
+            
+            if (TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskProcessedTime == TaskSchedInfo[OSTCBCur->OSTCBId - 1].LockR1) {
+                printf("%2d\tLockResource  \ttask(%2d)(%2d)\tR1\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
+                fprintf(Output_fp, "%2d\tLockResource  \ttask(%2d)(%2d)\tR1\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
+                TaskSchedInfo[OSTCBCur->OSTCBId - 1].HoldResNum++;
+            }
+            if (TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskProcessedTime == TaskSchedInfo[OSTCBCur->OSTCBId - 1].LockR2) {
+                printf("%2d\tLockResource  \ttask(%2d)(%2d)\tR2\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
+                fprintf(Output_fp, "%2d\tLockResource  \ttask(%2d)(%2d)\tR2\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
+                TaskSchedInfo[OSTCBCur->OSTCBId - 1].HoldResNum++;
+            }
+            if (TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskProcessedTime == TaskSchedInfo[OSTCBCur->OSTCBId - 1].UnlockR1) {
+                printf("%2d\tUnlockResource    task(%2d)(%2d)\tR1\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
+                fprintf(Output_fp, "%2d\tUnlockResource    task(%2d)(%2d)\tR1\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
+                TaskSchedInfo[OSTCBCur->OSTCBId - 1].HoldResNum--;
+            }
+            if (TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskProcessedTime == TaskSchedInfo[OSTCBCur->OSTCBId - 1].UnlockR2) {
+                printf("%2d\tUnlockResource    task(%2d)(%2d)\tR1\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
+                fprintf(Output_fp, "%2d\tUnlockResource    task(%2d)(%2d)\tR2\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
+                TaskSchedInfo[OSTCBCur->OSTCBId - 1].HoldResNum--;
+            }
             if (TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskProcessedTime == TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskExecuteTime) {
                 OSTCBHighRdy = OSTCBCur;        //由於OSIntCurTaskResume()函式中是將OSTCBHighRdy作為繼續執行的task
                 OS_EXIT_CRITICAL();             //當程式跑到這邊時，表示當前的task已經執行完畢，希望不被搶奪，趕快回去task中進到delay的部分結束執行後再重新schedule
                 return;
             }
         }
+        //M11102140 (PA3) (PARTI) 作業更改部分
+
+        
+
+
         //M11102140 (HW2) (PARTII) 作業更改部分
         if (OSIntNesting == 0u) {                          /* Reschedule only if all ISRs complete ... */
             if (OSLockNesting == 0u) {                     /* ... and not locked.                      */
@@ -722,24 +762,14 @@ void  OSIntExit (void)          //從ISR轉到普通task
                 if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy */
 
                     if (OSPrioCur != OS_TASK_IDLE_PRIO) {                               //經過timetick ISR後，有task醒來並且搶奪當前task的情況
-                        printf("%2d  \tPreemption\t  task(%2d)(%2d)\ttask(%2d)(%2d)\n", 
-                            OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr);
-                        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
-                            fprintf(Output_fp, "%2d  \tPreemption\t  task(%2d)(%2d)\ttask(%2d)(%2d)\n",
-                                OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr);
-                            fclose(Output_fp);
-                        }
+                        printf("%2d  \tPreemption\t  task(%2d)(%2d)\ttask(%2d)(%2d)\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr);
+                            fprintf(Output_fp, "%2d  \tPreemption\t  task(%2d)(%2d)\ttask(%2d)(%2d)\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr);
                     }
                     else {                                                             //經過timetick ISR後，有task醒來並且搶奪當前idle task的情況
-                        printf("%2d\tPreemption\t  task(%2d)    \ttask(%2d)(%2d)\n",    
-                            OSTime, OSTCBCur->OSTCBPrio, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr);
-                        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
-                            fprintf(Output_fp, "%2d\tPreemption\t  task(%2d)    \ttask(%2d)(%2d)\n",
-                                OSTime, OSTCBCur->OSTCBPrio, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr);
-                            fclose(Output_fp);
-                        }
+                        printf("%2d\tPreemption\t  task(%2d)    \ttask(%2d)(%2d)\n", OSTime, OSTCBCur->OSTCBPrio, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr);
+                        fprintf(Output_fp, "%2d\tPreemption\t  task(%2d)    \ttask(%2d)(%2d)\n", OSTime, OSTCBCur->OSTCBPrio, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr);
+
                     }
-                   
                     OSCtxSwCtr++;                          /* Keep track of the number of ctx switches */
 
 //#if OS_TASK_PROFILE_EN > 0u
@@ -904,26 +934,11 @@ void  OSSchedUnlock (void)
 void  OSStart (void)
 {
     if (OSRunning == OS_FALSE) {
-
+        fopen_s(&Output_fp, "./Output.txt", "a");
         OS_SchedNew();                               /* Find highest priority's task priority number   */
         OSPrioCur = OSPrioHighRdy;
         OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy]; /* Point to highest priority task ready to run    */
         OSTCBCur = OSTCBHighRdy;
-
-        //M11102140 (HW2) (PARTI) 作業更改部分
-        printf("================TCB linked list================\n");
-        printf("Task\tPrev_TCB_addr\tTCB_addr   Next_TCB_addr\n");
-        for (OS_TCB* TCB_iter = OSTCBList; TCB_iter != (OS_TCB*)0; TCB_iter = TCB_iter->OSTCBNext) {
-            if (TCB_iter->OSTCBPrio != OS_TASK_IDLE_PRIO) {
-                printf("%2d\t%11x\t%8x      %8x\n", TCB_iter->OSTCBId, TCB_iter->OSTCBPrev, TCB_iter, TCB_iter->OSTCBNext);
-            }
-            else {
-                printf("%2d\t%11x\t%8x      %8x\n", TCB_iter->OSTCBPrio, TCB_iter->OSTCBPrev, TCB_iter, TCB_iter->OSTCBNext);
-            }
-            
-        }
-        printf("Tick\tEvent     \tCurrentTask ID\tNextTask ID \tResponseTime\tPreemptionTime\tOSTimeDly\n");
-        //M11102140 (HW2) (PARTI) 作業更改部分
         OSStartHighRdy();                            /* Execute target specific code to start task     */
         
     }
@@ -1011,6 +1026,7 @@ void  OSTimeTick (void)
         //Setting the end time of the OS
         if (OSTimeGet() > SYSTEM_END_TIME) {
             OSRunning = OS_FALSE;
+            fclose(Output_fp);
             exit(0);
         }
         //Setting the end time of OS
@@ -1070,11 +1086,10 @@ void  OSTimeTick (void)
             if (OSTime > TaskSchedInfo[i].TaskDeadline) {
                 printf("%2d  \tMissDeadline      task(%2d)(%2d)  -------------------\n", OSTime - 1, OSTCBPrioTbl[TaskParameter[i].TaskPriority]->OSTCBId,
                     OSTCBPrioTbl[TaskParameter[i].TaskPriority]->OSTCBCtxSwCtr);
-                if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
-                    fprintf(Output_fp, "%2d  \tMissDeadline      task(%2d)(%2d)   -------------------\n", OSTime - 1, OSTCBPrioTbl[TaskParameter[i].TaskPriority]->OSTCBId,
+
+                fprintf(Output_fp, "%2d  \tMissDeadline      task(%2d)(%2d)   -------------------\n", OSTime - 1, OSTCBPrioTbl[TaskParameter[i].TaskPriority]->OSTCBId,
                         OSTCBPrioTbl[TaskParameter[i].TaskPriority]->OSTCBCtxSwCtr);
-                    fclose(Output_fp);
-                }
+                
                 exit(1);
             }
         }
@@ -1795,35 +1810,33 @@ void  OS_Sched (void)       //task和task之間切換
             if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy     */
 
                     if (OSPrioHighRdy != OS_TASK_IDLE_PRIO) {
-                        printf("%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t%7d\n",
+                        printf("%2d\tCompletion\ttask(%2d)(%2d)\ttask(%2d)(%2d) %8d %8d %7d\n",
                             OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr,
-                            (OSTime - TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskStartTime), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskExpFinTime)),
-                            (TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskDeadline - OSTime));
+                            (OSTime - TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskStartTime), TaskSchedInfo[OSTCBCur->OSTCBId - 1].BlockingTime,
+                            TaskSchedInfo[OSTCBCur->OSTCBId - 1].PreemptionTime);
 
-                        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
-                            fprintf(Output_fp, "%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)(%2d) \t%8d    \t%8d      \t%7d\n",
+                        fprintf(Output_fp, "%2d\tCompletion\ttask(%2d)(%2d)\ttask(%2d)(%2d) %8d %8d %7d\n",
                                 OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr,
-                                (OSTime - TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskStartTime), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskExpFinTime)),
-                                (TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskDeadline - OSTime));
-                            fclose(Output_fp);
-                        }
+                                (OSTime - TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskStartTime), TaskSchedInfo[OSTCBCur->OSTCBId - 1].BlockingTime,
+                                TaskSchedInfo[OSTCBCur->OSTCBId - 1].PreemptionTime);
                     }
                     else {
-                        printf("%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)    \t%8d    \t%8d      \t%7d\n",
+                        printf("%2d\tCompletion\ttask(%2d)(%2d)\ttask(%2d) %8d %8d %7d\n",
                             OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBPrio,
-                            (OSTime - TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskStartTime), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskExpFinTime)),
-                            (TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskDeadline - OSTime));
-                        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
-                            fprintf(Output_fp, "%2d  \tCompletion\t  task(%2d)(%2d)\ttask(%2d)    \t%8d    \t%8d      \t%7d\n",
+                            (OSTime - TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskStartTime), TaskSchedInfo[OSTCBCur->OSTCBId - 1].BlockingTime,
+                            TaskSchedInfo[OSTCBCur->OSTCBId - 1].PreemptionTime);
+                        
+                        fprintf(Output_fp, "%2d\tCompletion\ttask(%2d)(%2d)\ttask(%2d) %8d %8d %7d\n",
                                 OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBPrio,
-                                (OSTime - TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskStartTime), (OSTime - (TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskExpFinTime)),
-                                (TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskDeadline - OSTime));
-                            fclose(Output_fp);
-                        }
+                                (OSTime - TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskStartTime), TaskSchedInfo[OSTCBCur->OSTCBId - 1].BlockingTime,
+                                TaskSchedInfo[OSTCBCur->OSTCBId - 1].PreemptionTime);
+                        
                     }
                     TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskStartTime = TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskPeriodic;
                     TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskDeadline = TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskPeriodic;
                     TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskExpFinTime = TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskExecuteTime;
+                    TaskSchedInfo[OSTCBCur->OSTCBId - 1].BlockingTime = 0;
+                    TaskSchedInfo[OSTCBCur->OSTCBId - 1].PreemptionTime = 0;
 
 #if OS_TASK_PROFILE_EN > 0u
                     OSTCBCur->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task   當前最高priotity的task   */
@@ -1873,6 +1886,12 @@ static  void  OS_SchedNew (void)
 
     y             = OSUnMapTbl[OSRdyGrp];
     OSPrioHighRdy = (INT8U)((y << 3u) + OSUnMapTbl[OSRdyTbl[y]]);
+    if (OSTCBCur != NULL && OSTCBCur->OSTCBPrio != OS_TASK_IDLE_PRIO) {
+        if (TaskSchedInfo[OSTCBCur->OSTCBId - 1].HoldResNum > 0) {
+            OSPrioHighRdy = OSTCBCur->OSTCBPrio;
+        }
+    }
+    
 #else                                            /* We support up to 256 tasks                         */
     INT8U     y;
     OS_PRIO  *ptbl;

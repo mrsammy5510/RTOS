@@ -65,8 +65,6 @@ static  OS_STK  StartupTaskStk[APP_CFG_STARTUP_TASK_STK_SIZE];
 *********************************************************************************************************
 */
 static void task(void* p_arg);
-//static void task1(void* p_arg);
-//static void task2(void* p_arg);
 static  void  StartupTask(void* p_arg);
 
 
