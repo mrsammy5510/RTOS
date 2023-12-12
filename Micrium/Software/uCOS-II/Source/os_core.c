@@ -706,11 +706,10 @@ void  OSIntExit (void)          //從ISR轉到普通task
 
         for (int i = 0; i < TASK_NUMBER; i++) {
             if (OSTime > TaskSchedInfo[i].TaskStartTime) {      //此task已到來
-                //int MinLockTime = TaskSchedInfo[i].LockR1 < TaskSchedInfo[i].LockR2 ? TaskSchedInfo[i].LockR1 : TaskSchedInfo[i].LockR2;
-                if (TaskSchedInfo[i].TaskPeriodic < OSPrioCur) {        //被卡住的task的prio比當前高
+                if (TaskParameter[i].TaskPriority < OSPrioCur) {        //被卡住的task的prio比當前高
                     TaskSchedInfo[i].BlockingTime++;
                 }
-                if (TaskSchedInfo[i].TaskPeriodic > OSPrioCur) {        //被卡住的task的prio比當前低
+                if (TaskParameter[i].TaskPriority > OSPrioCur) {        //被卡住的task的prio比當前低
                     TaskSchedInfo[i].PreemptionTime++;
                 }
             }
@@ -722,25 +721,63 @@ void  OSIntExit (void)          //從ISR轉到普通task
             TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskProcessedTime++;
             
             if (TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskProcessedTime == TaskSchedInfo[OSTCBCur->OSTCBId - 1].LockR1) {
-                printf("%2d\tLockResource  \ttask(%2d)(%2d)\tR1\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
-                fprintf(Output_fp, "%2d\tLockResource  \ttask(%2d)(%2d)\tR1\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
-                TaskSchedInfo[OSTCBCur->OSTCBId - 1].HoldResNum++;
+                int newPrio = ResourcePrio[0] < TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio ? ResourcePrio[0] : TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio;
+                printf("%2d\tLockResource  \ttask(%2d)(%2d)\tR1\t%d to %d\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, 
+                        TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio, newPrio);
+                fprintf(Output_fp, "%2d\tLockResource  \ttask(%2d)(%2d)\tR1\t%d to %d\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, 
+                        TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio, newPrio);
+                TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio = newPrio;
+                TaskSchedInfo[OSTCBCur->OSTCBId - 1].HoldR1++;
             }
             if (TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskProcessedTime == TaskSchedInfo[OSTCBCur->OSTCBId - 1].LockR2) {
-                printf("%2d\tLockResource  \ttask(%2d)(%2d)\tR2\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
-                fprintf(Output_fp, "%2d\tLockResource  \ttask(%2d)(%2d)\tR2\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
-                TaskSchedInfo[OSTCBCur->OSTCBId - 1].HoldResNum++;
+                int newPrio = ResourcePrio[1] < TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio ? ResourcePrio[1] : TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio;
+                printf("%2d\tLockResource  \ttask(%2d)(%2d)\tR2\t%d to %d\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr,
+                        TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio, newPrio);
+                fprintf(Output_fp, "%2d\tLockResource  \ttask(%2d)(%2d)\tR2\t%d to %d\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr,
+                        TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio, newPrio);
+                TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio = newPrio;
+                TaskSchedInfo[OSTCBCur->OSTCBId - 1].HoldR2++;
             }
             if (TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskProcessedTime == TaskSchedInfo[OSTCBCur->OSTCBId - 1].UnlockR1) {
-                printf("%2d\tUnlockResource    task(%2d)(%2d)\tR1\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
-                fprintf(Output_fp, "%2d\tUnlockResource    task(%2d)(%2d)\tR1\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
-                TaskSchedInfo[OSTCBCur->OSTCBId - 1].HoldResNum--;
+                TaskSchedInfo[OSTCBCur->OSTCBId - 1].HoldR1--;
+                if (TaskSchedInfo[OSTCBCur->OSTCBId - 1].HoldR2) {
+                    int newPrio = ResourcePrio[1] < TaskParameter[OSTCBCur->OSTCBId - 1].TaskPriority ? ResourcePrio[1] : TaskParameter[OSTCBCur->OSTCBId - 1].TaskPriority;
+                    printf("%2d\tUnlockResource    task(%2d)(%2d)\tR1\t%d to %d\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, 
+                            TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio, newPrio);
+                    fprintf(Output_fp, "%2d\tUnlockResource    task(%2d)(%2d)\tR1\t%d to %d\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr,
+                        TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio, newPrio);
+                    TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio = newPrio;
+                }
+                else {
+                    int newPrio = TaskParameter[OSTCBCur->OSTCBId - 1].TaskPriority;
+                    printf("%2d\tUnlockResource    task(%2d)(%2d)\tR1\t%d to %d\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr,
+                        TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio, newPrio);
+                    fprintf(Output_fp, "%2d\tUnlockResource    task(%2d)(%2d)\tR1\t%d to %d\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr,
+                        TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio, newPrio);
+                    TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio = newPrio;
+                }
             }
             if (TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskProcessedTime == TaskSchedInfo[OSTCBCur->OSTCBId - 1].UnlockR2) {
-                printf("%2d\tUnlockResource    task(%2d)(%2d)\tR1\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
-                fprintf(Output_fp, "%2d\tUnlockResource    task(%2d)(%2d)\tR2\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
-                TaskSchedInfo[OSTCBCur->OSTCBId - 1].HoldResNum--;
+                TaskSchedInfo[OSTCBCur->OSTCBId - 1].HoldR2--;
+                if (TaskSchedInfo[OSTCBCur->OSTCBId - 1].HoldR1) {
+                    int newPrio = ResourcePrio[0] < TaskParameter[OSTCBCur->OSTCBId - 1].TaskPriority ? ResourcePrio[0] : TaskParameter[OSTCBCur->OSTCBId - 1].TaskPriority;
+                    printf("%2d\tUnlockResource    task(%2d)(%2d)\tR2\t%d to %d\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr,
+                        TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio, newPrio);
+                    fprintf(Output_fp, "%2d\tUnlockResource    task(%2d)(%2d)\tR2\t%d to %d\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr,
+                        TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio, newPrio);
+                    TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio = newPrio;
+                }
+                else {
+                    int newPrio = TaskParameter[OSTCBCur->OSTCBId - 1].TaskPriority;
+                    printf("%2d\tUnlockResource    task(%2d)(%2d)\tR2\t%d to %d\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr,
+                        TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio, newPrio);
+                    fprintf(Output_fp, "%2d\tUnlockResource    task(%2d)(%2d)\tR2\t%d to %d\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr,
+                        TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio, newPrio);
+                    TaskSchedInfo[OSTCBCur->OSTCBId - 1].Prio = newPrio;
+                }
             }
+
+
             if (TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskProcessedTime == TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskExecuteTime) {
                 OSTCBHighRdy = OSTCBCur;        //由於OSIntCurTaskResume()函式中是將OSTCBHighRdy作為繼續執行的task
                 OS_EXIT_CRITICAL();             //當程式跑到這邊時，表示當前的task已經執行完畢，希望不被搶奪，趕快回去task中進到delay的部分結束執行後再重新schedule
@@ -763,7 +800,7 @@ void  OSIntExit (void)          //從ISR轉到普通task
 
                     if (OSPrioCur != OS_TASK_IDLE_PRIO) {                               //經過timetick ISR後，有task醒來並且搶奪當前task的情況
                         printf("%2d  \tPreemption\t  task(%2d)(%2d)\ttask(%2d)(%2d)\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr);
-                            fprintf(Output_fp, "%2d  \tPreemption\t  task(%2d)(%2d)\ttask(%2d)(%2d)\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr);
+                        fprintf(Output_fp, "%2d  \tPreemption\t  task(%2d)(%2d)\ttask(%2d)(%2d)\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr);
                     }
                     else {                                                             //經過timetick ISR後，有task醒來並且搶奪當前idle task的情況
                         printf("%2d\tPreemption\t  task(%2d)    \ttask(%2d)(%2d)\n", OSTime, OSTCBCur->OSTCBPrio, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr);
@@ -1834,7 +1871,6 @@ void  OS_Sched (void)       //task和task之間切換
                     }
                     TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskStartTime = TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskPeriodic;
                     TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskDeadline = TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskPeriodic;
-                    TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskExpFinTime = TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskStartTime + TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskExecuteTime;
                     TaskSchedInfo[OSTCBCur->OSTCBId - 1].BlockingTime = 0;
                     TaskSchedInfo[OSTCBCur->OSTCBId - 1].PreemptionTime = 0;
 
@@ -1887,8 +1923,12 @@ static  void  OS_SchedNew (void)
     y             = OSUnMapTbl[OSRdyGrp];
     OSPrioHighRdy = (INT8U)((y << 3u) + OSUnMapTbl[OSRdyTbl[y]]);
     if (OSTCBCur != NULL && OSTCBCur->OSTCBPrio != OS_TASK_IDLE_PRIO) {
-        if (TaskSchedInfo[OSTCBCur->OSTCBId - 1].HoldResNum > 0) {
-            OSPrioHighRdy = OSTCBCur->OSTCBPrio;
+        int HighPrio = 64;
+        for (int i = 0; i < TASK_NUMBER; i++) {
+            if (TaskSchedInfo[i].Prio < HighPrio && OSTCBPrioTbl[TaskParameter[i].TaskPriority]->OSTCBDly == 0) {
+                HighPrio = TaskSchedInfo[i].Prio;
+                OSPrioHighRdy = TaskParameter[i].TaskPriority;
+            }
         }
     }
     

@@ -88,6 +88,32 @@
 *********************************************************************************************************
 */
 
+void swap(int* a, int* b) {
+    int tmp = *a;
+    *a = *b;
+    *b = tmp;
+}
+
+void quicksort(int* arr, int left, int right) {
+    if (left < right)
+    {
+        int mid = (left + right) / 2;
+        int pivot = arr[mid];
+        int i = left - 1;
+        int j = right + 1;
+        while (1) {
+            while (arr[++i] < pivot);
+            while (arr[--j] > pivot);
+            if (i >= j)
+                break;
+            swap(&arr[i], &arr[j]);
+        }
+
+        quicksort(arr, left, mid - 1);
+        quicksort(arr, mid + 1, right);
+    }
+}
+
 void OutFileInit()
 {
     /*Clear the file*/
@@ -152,12 +178,38 @@ void InputFile()
 
             i++;
         }
-        // Initial Priority
-        //M11102140 (HW2) (PARTII) 作業更改部分
-        TaskParameter[j].TaskPriority = TaskParameter[j].TaskPeriodic;
-        //M11102140 (HW2) (PARTII) 作業更改部分
         j++;
     }
+    int* arr = (int*)malloc(sizeof(int) * TASK_NUMBER);
+
+    for (int i = 0; i < TASK_NUMBER; i++) {
+        arr[i] = TaskParameter[i].TaskPeriodic;
+    }
+    quicksort(arr, 0, TASK_NUMBER - 1);
+    for (int i = 0, prio = 3; i < TASK_NUMBER; i++) {       //從period小到大給priority
+        for (int j = 0; j < TASK_NUMBER; j++) {
+            if (arr[i] == TaskParameter[j].TaskPeriodic) {
+                TaskParameter[j].TaskPriority = prio;
+                prio += 3;
+                break;
+            }
+        }
+    }
+    for (int i = 0; i < RES_NUM; i++) {         
+        ResourcePrio[i] = 64;
+    }
+    for (int i = 0; i < TASK_NUMBER; i++) {         //分配Resource的priority
+        if (TaskParameter[i].LockR1 != 0) {
+            ResourcePrio[0] = TaskParameter[i].TaskPriority < ResourcePrio[0] ? TaskParameter[i].TaskPriority : ResourcePrio[0];
+        }
+        if (TaskParameter[i].LockR2 != 0) {
+            ResourcePrio[1] = TaskParameter[i].TaskPriority < ResourcePrio[1] ? TaskParameter[i].TaskPriority : ResourcePrio[1];
+        }
+    }
+    for (int i = 0; i < RES_NUM; i++) {
+        ResourcePrio[i] -= (i + 1);
+    }
+
     fclose(fp);
     //Read file
 }

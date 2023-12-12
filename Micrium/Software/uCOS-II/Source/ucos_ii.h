@@ -71,6 +71,7 @@ FILE* fp;
 #define OUTPUT_FILE_NAME "./Output.txt"
 #define MAX 20      //Task maximum number
 #define INFO 10      //information of task
+#define RES_NUM 2
 /*Input File*/
 
 /*Output File*/
@@ -104,16 +105,17 @@ typedef struct task_sched_info {
     INT16U TaskExecuteTime;
     INT16U TaskPeriodic;
     INT16U TaskDeadline;
-    INT16U TaskExpFinTime;
     INT16U TaskProcessedTime;
 
-    INT16U HoldResNum;
+    INT16U HoldR1;
+    INT16U HoldR2;
     INT16U LockR1;
     INT16U UnlockR1;
     INT16U LockR2;
     INT16U UnlockR2;
     INT16U BlockingTime;
     INT16U PreemptionTime;
+    INT16U Prio;
 }task_sched_info;
 //M11102140 (HW2) (PARTII) 作業更改部分
 
@@ -124,6 +126,7 @@ OS_STK** Task_STK;
 task_para_set TaskParameter[OS_MAX_TASKS];
 //M11102140 (HW2) (PARTII) 作業更改部分
 task_sched_info TaskSchedInfo[OS_MAX_TASKS];
+int ResourcePrio[RES_NUM];
 //M11102140 (HW2) (PARTII) 作業更改部分
 
 #ifdef   OS_GLOBALS
