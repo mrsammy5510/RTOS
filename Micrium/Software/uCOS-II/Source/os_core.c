@@ -704,9 +704,9 @@ void  OSIntExit (void)          //從ISR轉到普通task
             OSIntNesting--;
         }
 
+        //M11102140 (HW3) (PARTI) 作業更改部分
         for (int i = 0; i < TASK_NUMBER; i++) {
             if (OSTime > TaskSchedInfo[i].TaskStartTime) {      //此task已到來
-                //int MinLockTime = TaskSchedInfo[i].LockR1 < TaskSchedInfo[i].LockR2 ? TaskSchedInfo[i].LockR1 : TaskSchedInfo[i].LockR2;
                 if (TaskSchedInfo[i].TaskPeriodic < OSPrioCur) {        //被卡住的task的prio比當前高
                     TaskSchedInfo[i].BlockingTime++;
                 }
@@ -716,8 +716,6 @@ void  OSIntExit (void)          //從ISR轉到普通task
             }
         }
 
-
-        //M11102140 (PA3) (PARTI) 作業更改部分
         if (OSPrioCur != OS_TASK_IDLE_PRIO) {
             TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskProcessedTime++;
             
@@ -737,7 +735,7 @@ void  OSIntExit (void)          //從ISR轉到普通task
                 TaskSchedInfo[OSTCBCur->OSTCBId - 1].HoldResNum--;
             }
             if (TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskProcessedTime == TaskSchedInfo[OSTCBCur->OSTCBId - 1].UnlockR2) {
-                printf("%2d\tUnlockResource    task(%2d)(%2d)\tR1\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
+                printf("%2d\tUnlockResource    task(%2d)(%2d)\tR2\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
                 fprintf(Output_fp, "%2d\tUnlockResource    task(%2d)(%2d)\tR2\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
                 TaskSchedInfo[OSTCBCur->OSTCBId - 1].HoldResNum--;
             }
@@ -752,7 +750,7 @@ void  OSIntExit (void)          //從ISR轉到普通task
         
 
 
-        //M11102140 (HW2) (PARTII) 作業更改部分
+        //M11102140(PA3) (PARTI) 作業更改部分
         if (OSIntNesting == 0u) {                          /* Reschedule only if all ISRs complete ... */
             if (OSLockNesting == 0u) {                     /* ... and not locked.                      */
                 OS_SchedNew();
@@ -763,7 +761,7 @@ void  OSIntExit (void)          //從ISR轉到普通task
 
                     if (OSPrioCur != OS_TASK_IDLE_PRIO) {                               //經過timetick ISR後，有task醒來並且搶奪當前task的情況
                         printf("%2d  \tPreemption\t  task(%2d)(%2d)\ttask(%2d)(%2d)\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr);
-                            fprintf(Output_fp, "%2d  \tPreemption\t  task(%2d)(%2d)\ttask(%2d)(%2d)\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr);
+                        fprintf(Output_fp, "%2d  \tPreemption\t  task(%2d)(%2d)\ttask(%2d)(%2d)\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr);
                     }
                     else {                                                             //經過timetick ISR後，有task醒來並且搶奪當前idle task的情況
                         printf("%2d\tPreemption\t  task(%2d)    \ttask(%2d)(%2d)\n", OSTime, OSTCBCur->OSTCBPrio, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr);
@@ -775,7 +773,7 @@ void  OSIntExit (void)          //從ISR轉到普通task
 //#if OS_TASK_PROFILE_EN > 0u
                     //OSTCBCur->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task  */
 //#endif          
-                    //M11102140 (HW2) (PARTII) 作業更改部分
+        //M11102140(PA3) (PARTI) 作業更改部分
 
 
 #if OS_TASK_CREATE_EXT_EN > 0u
@@ -1806,7 +1804,7 @@ void  OS_Sched (void)       //task和task之間切換
             OS_SchedNew();
             OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];//拿出最高priority的已ready task
 
-            //M11102140 (HW2) (PARTII) 作業更改部分
+            //M11102140 (PA3) (PARTI) 作業更改部分
             if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy     */
 
                     if (OSPrioHighRdy != OS_TASK_IDLE_PRIO) {
@@ -1842,7 +1840,7 @@ void  OS_Sched (void)       //task和task之間切換
                     OSTCBCur->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task   當前最高priotity的task   */
 #endif      
                     OSCtxSwCtr++;                          /* Increment context switch counter             */   //總共context switch幾次
-            //M11102140 (HW2) (PARTII) 作業更改部分
+            //M11102140 (PA3) (PARTI) 作業更改部分
 
 
                 
@@ -1886,12 +1884,13 @@ static  void  OS_SchedNew (void)
 
     y             = OSUnMapTbl[OSRdyGrp];
     OSPrioHighRdy = (INT8U)((y << 3u) + OSUnMapTbl[OSRdyTbl[y]]);
+    //M11102140 (HW3) (PARTI) 作業更改部分
     if (OSTCBCur != NULL && OSTCBCur->OSTCBPrio != OS_TASK_IDLE_PRIO) {
         if (TaskSchedInfo[OSTCBCur->OSTCBId - 1].HoldResNum > 0) {
             OSPrioHighRdy = OSTCBCur->OSTCBPrio;
         }
     }
-    
+    //M11102140 (HW3) (PARTI) 作業更改部分
 #else                                            /* We support up to 256 tasks                         */
     INT8U     y;
     OS_PRIO  *ptbl;

@@ -1,30 +1,22 @@
-﻿  cpu_c.c
-  cpu_core.c
-  lib_ascii.c
-  lib_math.c
-  lib_mem.c
-  lib_str.c
-  os_core.c
-C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(1030,13): warning C4013: 'exit' 未定義; 假設 extern 傳回整數
-C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(2271,20): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 2 的類型為 'OS_TCB *'
-C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(2275,20): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 2 的類型為 'OS_TCB *'
-C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(2278,16): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 1 的類型為 'os_tcb *'
-C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(2279,16): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 1 的類型為 'OS_TCB *'
-C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(2280,16): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 1 的類型為 'os_tcb *'
+﻿  os_core.c
+C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(1028,13): warning C4013: 'exit' 未定義; 假設 extern 傳回整數
+C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(2270,20): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 2 的類型為 'OS_TCB *'
+C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(2274,20): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 2 的類型為 'OS_TCB *'
+C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(2277,16): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 1 的類型為 'os_tcb *'
+C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(2278,16): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 1 的類型為 'OS_TCB *'
+C:\Master_stuff\112-1\RTOS\Micrium\Software\uCOS-II\Source\os_core.c(2279,16): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 1 的類型為 'os_tcb *'
   os_q.c
   os_sem.c
   os_task.c
   os_time.c
   os_tmr.c
-  bsp_cpu.c
   app_hooks.c
 C:\Master_stuff\112-1\RTOS\Microsoft\Windows\Kernel\OS2\app_hooks.c(124,27): warning C4013: 'atoi' 未定義; 假設 extern 傳回整數
   main.c
 C:\Master_stuff\112-1\RTOS\Microsoft\Windows\Kernel\OS2\main.c(108,16): warning C4013: 'malloc' 未定義; 假設 extern 傳回整數
 C:\Master_stuff\112-1\RTOS\Microsoft\Windows\Kernel\OS2\main.c(108,14): warning C4047: '=': 'OS_STK **' 與 'int' 間接取值的層級不同
-C:\Master_stuff\112-1\RTOS\Microsoft\Windows\Kernel\OS2\main.c(114,21): warning C4047: '=': 'OS_STK *' 與 'int' 間接取值的層級不同
-C:\Master_stuff\112-1\RTOS\Microsoft\Windows\Kernel\OS2\main.c(118,29): warning C4244: '函式': 將 'INT16U' 轉換為 'INT8U'，由於類型不同，可能導致資料遺失
+C:\Master_stuff\112-1\RTOS\Microsoft\Windows\Kernel\OS2\main.c(113,21): warning C4047: '=': 'OS_STK *' 與 'int' 間接取值的層級不同
+C:\Master_stuff\112-1\RTOS\Microsoft\Windows\Kernel\OS2\main.c(117,29): warning C4244: '函式': 將 'INT16U' 轉換為 'INT8U'，由於類型不同，可能導致資料遺失
 C:\Master_stuff\112-1\RTOS\Microsoft\Windows\Kernel\OS2\main.c(89,17): warning C4101: 'os_err': 未參考的區域變數
   正在產生程式碼...
-  LINK : 最後的累加連結找不到或未建置 C:\Master_stuff\112-1\RTOS\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe，正在執行完整連結
   OS2.vcxproj -> C:\Master_stuff\112-1\RTOS\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe

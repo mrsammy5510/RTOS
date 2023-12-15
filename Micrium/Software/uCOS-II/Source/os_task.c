@@ -392,7 +392,7 @@ INT8U  OSTaskCreateExt (void   (*task)(void *p_arg),
         psp = OSTaskStkInit(task, p_arg, ptos, opt);           /* Initialize the task's stack          */   //初始化每個task中的stack
         err = OS_TCBInit(prio, psp, pbos, id, stk_size, pext, opt);     //初始化Task Control Block
 
-        //M11102140 (HW2) (PARTII) 作業更改部分
+        //M11102140 (HW3) (PARTI) 作業更改部分
         if (prio != OS_TASK_IDLE_PRIO) {                            //將task作delay，與OSTimeDly不同的是不重新作OS_Sched()
             task_para_set* taskPara = p_arg;
             OS_TCB* ptcb = OSTCBPrioTbl[prio];
