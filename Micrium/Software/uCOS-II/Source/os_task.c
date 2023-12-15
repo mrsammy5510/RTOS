@@ -392,7 +392,7 @@ INT8U  OSTaskCreateExt (void   (*task)(void *p_arg),
         psp = OSTaskStkInit(task, p_arg, ptos, opt);           /* Initialize the task's stack          */   //﹍て–taskいstack
         err = OS_TCBInit(prio, psp, pbos, id, stk_size, pext, opt);     //﹍てTask Control Block
 
-        //M11102140 (HW2) (PARTII) 穨э场だ
+        //M11102140 (PA3) (PARTII) 穨э场だ
         if (prio != OS_TASK_IDLE_PRIO) {                            //盢taskdelay籔OSTimeDlyぃ琌ぃ穝OS_Sched()
             task_para_set* taskPara = p_arg;
             OS_TCB* ptcb = OSTCBPrioTbl[prio];
@@ -428,7 +428,7 @@ INT8U  OSTaskCreateExt (void   (*task)(void *p_arg),
 
             }
         }
-        //M11102140 (HW2) (PARTII) 穨э场だ
+        //M11102140 (PA3) (PARTII) 穨э场だ
 
         if (err == OS_ERR_NONE) {
             OS_TRACE_TASK_CREATE(OSTCBPrioTbl[prio]);           //承task

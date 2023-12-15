@@ -180,6 +180,7 @@ void InputFile()
         }
         j++;
     }
+    //M11102140 (PA3) (PARTII) 作業更改部分
     int* arr = (int*)malloc(sizeof(int) * TASK_NUMBER);
 
     for (int i = 0; i < TASK_NUMBER; i++) {
@@ -211,6 +212,7 @@ void InputFile()
     }
 
     fclose(fp);
+    //M11102140 (PA3) (PARTII) 作業更改部分
     //Read file
 }
 /*

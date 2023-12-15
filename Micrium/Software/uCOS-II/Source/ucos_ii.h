@@ -64,7 +64,7 @@ extern "C" {
 *********************************************************************************************************
 */
 #define SYSTEM_END_TIME 100
-
+//M11102140 (PA3) (PARTI) 穨э场だ
 /*Input File*/
 FILE* fp;
 #define INPUT_FILE_NAME "./TaskSet.txt"
@@ -73,13 +73,14 @@ FILE* fp;
 #define INFO 10      //information of task
 #define RES_NUM 2
 /*Input File*/
+//M11102140 (PA3) (PARTI) 穨э场だ
 
 /*Output File*/
 FILE* Output_fp;
 errno_t Output_err;
 /*Output File*/
 
-//M11102140 (PA3) (PARTI) 穨э场だ
+
 /*Task Structure*/
 typedef struct task_para_set {
     INT16U TaskID;
@@ -99,7 +100,7 @@ typedef struct task_para_set {
 int TASK_NUMBER;        //Number of the input tasks
 /*Task structure*/
 
-//M11102140 (HW2) (PARTII) 穨э场だ
+//M11102140 (PA3) (PARTI) 穨э场だ
 typedef struct task_sched_info {
     INT16U TaskStartTime;
     INT16U TaskExecuteTime;
@@ -117,17 +118,15 @@ typedef struct task_sched_info {
     INT16U PreemptionTime;
     INT16U Prio;
 }task_sched_info;
-//M11102140 (HW2) (PARTII) 穨э场だ
 
 /*Dynamic Create the Stack Size*/
 OS_STK** Task_STK;
 
 /*Create Task*/
 task_para_set TaskParameter[OS_MAX_TASKS];
-//M11102140 (HW2) (PARTII) 穨э场だ
 task_sched_info TaskSchedInfo[OS_MAX_TASKS];
 int ResourcePrio[RES_NUM];
-//M11102140 (HW2) (PARTII) 穨э场だ
+//M11102140 (PA3) (PARTI) 穨э场だ
 
 #ifdef   OS_GLOBALS
 #define  OS_EXT

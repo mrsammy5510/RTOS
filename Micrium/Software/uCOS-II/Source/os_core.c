@@ -703,7 +703,7 @@ void  OSIntExit (void)          //眖ISR锣炊硄task
         if (OSIntNesting > 0u) {                           /* Prevent OSIntNesting from wrapping       */
             OSIntNesting--;
         }
-
+        //M11102140 (PA3) (PARTII) 穨э场だ
         for (int i = 0; i < TASK_NUMBER; i++) {
             if (OSTime > TaskSchedInfo[i].TaskStartTime) {      //taskㄓ
                 if (TaskParameter[i].TaskPriority < OSPrioCur) {        //砆taskprioゑ讽玡蔼
@@ -714,9 +714,9 @@ void  OSIntExit (void)          //眖ISR锣炊硄task
                 }
             }
         }
+        //M11102140 (PA3) (PARTII) 穨э场だ
 
-
-        //M11102140 (PA3) (PARTI) 穨э场だ
+        //M11102140 (PA3) (PARTII) 穨э场だ
         if (OSPrioCur != OS_TASK_IDLE_PRIO) {
             TaskSchedInfo[OSTCBCur->OSTCBId - 1].TaskProcessedTime++;
             
@@ -784,18 +784,16 @@ void  OSIntExit (void)          //眖ISR锣炊硄task
                 return;
             }
         }
-        //M11102140 (PA3) (PARTI) 穨э场だ
+        //M11102140 (PA3) (PARTII) 穨э场だ
 
         
 
 
-        //M11102140 (HW2) (PARTII) 穨э场だ
+        //M11102140 (PA3) (PARTII) 穨э场だ
         if (OSIntNesting == 0u) {                          /* Reschedule only if all ISRs complete ... */
             if (OSLockNesting == 0u) {                     /* ... and not locked.                      */
                 OS_SchedNew();
                 OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];
-                
-                //M11102140 (HW2) (PARTII) 穨э场だ
                 if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy */
 
                     if (OSPrioCur != OS_TASK_IDLE_PRIO) {                               //竒筁timetick ISRΤtask眶ㄓ穖管讽玡task薄猵
@@ -812,7 +810,7 @@ void  OSIntExit (void)          //眖ISR锣炊硄task
 //#if OS_TASK_PROFILE_EN > 0u
                     //OSTCBCur->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task  */
 //#endif          
-                    //M11102140 (HW2) (PARTII) 穨э场だ
+        //M11102140 (PA3) (PARTII) 穨э场だ
 
 
 #if OS_TASK_CREATE_EXT_EN > 0u
@@ -1843,7 +1841,7 @@ void  OS_Sched (void)       //task㎝taskぇ丁ち传
             OS_SchedNew();
             OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];//程蔼priorityready task
 
-            //M11102140 (HW2) (PARTII) 穨э场だ
+            //M11102140 (PA3) (PARTI) 穨э场だ
             if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy     */
 
                     if (OSPrioHighRdy != OS_TASK_IDLE_PRIO) {
@@ -1878,7 +1876,7 @@ void  OS_Sched (void)       //task㎝taskぇ丁ち传
                     OSTCBCur->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task   讽玡程蔼priotitytask   */
 #endif      
                     OSCtxSwCtr++;                          /* Increment context switch counter             */   //羆context switch碭Ω
-            //M11102140 (HW2) (PARTII) 穨э场だ
+            //M11102140 (PA3) (PARTI) 穨э场だ
 
 
                 
@@ -1919,7 +1917,7 @@ static  void  OS_SchedNew (void)
 #if OS_LOWEST_PRIO <= 63u                        /* See if we support up to 64 tasks                   */
     INT8U   y;
 
-
+    //M11102140 (PA3) (PARTII) 穨э场だ
     y             = OSUnMapTbl[OSRdyGrp];
     OSPrioHighRdy = (INT8U)((y << 3u) + OSUnMapTbl[OSRdyTbl[y]]);
     if (OSTCBCur != NULL && OSTCBCur->OSTCBPrio != OS_TASK_IDLE_PRIO) {
@@ -1931,6 +1929,7 @@ static  void  OS_SchedNew (void)
             }
         }
     }
+    //M11102140 (PA3) (PARTII) 穨э场だ
     
 #else                                            /* We support up to 256 tasks                         */
     INT8U     y;
